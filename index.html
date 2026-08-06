@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CyberDealz Generator - Full Category Edition</title>
+  <title>CyberDealz Generator - Pro Edition</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -29,7 +29,8 @@
               card: '#0d1321',
               border: '#1e293b',
               accent: '#06b6d4',
-              tg: '#17212b'
+              tgBg: '#0f172a',
+              tgBubble: '#1e293b'
             }
           }
         }
@@ -46,12 +47,19 @@
     .glass-panel { background: rgba(13, 19, 33, 0.7); backdrop-filter: blur(10px); border: 1px solid #1e293b; }
     .neon-glow { box-shadow: 0 0 20px rgba(6, 182, 212, 0.1); }
     
+    /* Custom Date Picker Icon Styling for Dark Mode */
+    ::-webkit-calendar-picker-indicator {
+        filter: invert(1) hue-rotate(180deg) brightness(1.5);
+        cursor: pointer;
+    }
+    
     .fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
     .fade-enter-from, .fade-leave-to { opacity: 0; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-cyan-500 selection:text-black">
 
+<!-- STREAMING_CHUNK:Initializing Application Container -->
 <div id="app" class="flex flex-col min-h-screen">
 
   <!-- HEADER -->
@@ -63,12 +71,12 @@
         </div>
         <div>
           <h1 class="font-cyber text-2xl font-bold tracking-wider text-white uppercase leading-tight">CYBER<span class="text-cyan-400">DEALZ</span></h1>
-          <div class="text-[10px] font-mono text-cyan-500 tracking-widest uppercase">Content Generator v5.2</div>
+          <div class="text-[10px] font-mono text-cyan-500 tracking-widest uppercase">Content Generator v6.0 Pro</div>
         </div>
       </div>
       <div class="flex space-x-3">
-        <button @click="resetApp" class="px-3 py-1.5 rounded-lg border border-slate-700 text-xs font-semibold hover:bg-slate-800 transition text-slate-300">
-          <i class="fa-solid fa-rotate-left mr-1"></i> Reset
+        <button @click="resetApp" class="px-4 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-xs font-semibold transition text-slate-200 flex items-center shadow-sm">
+          <i class="fa-solid fa-rotate-left mr-2"></i> Alles zurücksetzen
         </button>
       </div>
     </div>
@@ -81,165 +89,211 @@
       <!-- LEFT COLUMN: Formular -->
       <div class="lg:col-span-7 space-y-6">
         
-        <!-- Kategorie Auswahl (Alle 11 Typen) -->
+        <!-- STREAMING_CHUNK:Rendering Category Selection -->
         <div class="glass-panel rounded-2xl p-5 neon-glow">
-          <div class="flex justify-between items-center mb-3">
+          <div class="flex justify-between items-center mb-4">
             <h2 class="font-cyber text-lg font-bold text-white uppercase tracking-wider flex items-center">
               <i class="fa-solid fa-layer-group text-cyan-400 mr-2"></i> Deal Kategorie
             </h2>
-            <span class="text-xs text-slate-400 font-mono">{{ categories.length }} Kategorien</span>
+            <span class="text-xs text-slate-400 font-mono bg-slate-800/50 px-2 py-1 rounded-md">{{ categories.length }} Kategorien</span>
           </div>
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
             <button v-for="cat in categories" :key="cat.id" @click="selectCategory(cat)"
-              :class="['px-3 py-2.5 rounded-xl border text-xs font-medium transition flex items-center space-x-2 text-left', 
-                       selectedCategory.id === cat.id ? 'bg-cyan-500/15 border-cyan-500 text-white shadow-[0_0_12px_rgba(6,182,212,0.25)] font-semibold' : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-600']">
-              <span class="text-base leading-none">{{ cat.icon }}</span>
+              :class="['px-3 py-2.5 rounded-xl border text-sm font-medium transition flex items-center space-x-2 text-left', 
+                       selectedCategory.id === cat.id ? 'bg-cyan-500/15 border-cyan-500 text-white shadow-[0_0_12px_rgba(6,182,212,0.25)] font-bold' : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-600']">
+              <span class="text-lg leading-none">{{ cat.icon }}</span>
               <span class="truncate">{{ cat.name }}</span>
             </button>
           </div>
         </div>
 
-        <!-- Basis Produktdaten -->
-        <div class="glass-panel rounded-2xl p-5">
-          <h2 class="font-cyber text-lg font-bold text-white uppercase tracking-wider mb-4 flex items-center">
+        <!-- STREAMING_CHUNK:Rendering Base Data Form -->
+        <div class="glass-panel rounded-2xl p-6 relative">
+          <h2 class="font-cyber text-lg font-bold text-white uppercase tracking-wider mb-5 flex items-center">
             <i class="fa-solid fa-box-open text-cyan-400 mr-2"></i> Basis Daten
           </h2>
           
-          <div class="space-y-4">
+          <div class="space-y-5">
+            <!-- Titel -->
             <div>
               <label class="block text-xs font-semibold text-slate-400 mb-1.5">Produktname <span class="text-rose-400">*</span></label>
-              <input type="text" v-model="form.title" placeholder="z.B. Sony PlayStation 5 Slim / Samsung Galaxy S24 Ultra" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition">
+              <input type="text" v-model="form.title" placeholder="z.B. Sony PlayStation 5 Slim / Samsung Galaxy S24 Ultra" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition shadow-inner">
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Preise -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-900/40 p-4 rounded-xl border border-slate-800">
               <div>
-                <label class="block text-xs font-semibold text-slate-400 mb-1.5">Neuer Preis (€) <span class="text-rose-400">*</span></label>
-                <input type="number" step="0.01" v-model.number="form.newPrice" placeholder="0.00" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-emerald-400 font-bold focus:border-cyan-500 outline-none transition">
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="block text-xs font-semibold text-slate-400">Neuer Preis (€) <span class="text-rose-400">*</span></label>
+                  <span v-if="discountInfo" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                    -{{ discountInfo.percent }}%
+                  </span>
+                </div>
+                <input type="number" step="0.01" v-model.number="form.newPrice" placeholder="0.00" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-base text-emerald-400 font-bold focus:border-emerald-500 outline-none transition">
               </div>
               <div>
                 <label class="block text-xs font-semibold text-slate-400 mb-1.5">Alter Preis / UVP (€)</label>
-                <input type="number" step="0.01" v-model.number="form.oldPrice" placeholder="0.00" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-rose-400 focus:border-cyan-500 outline-none transition">
+                <input type="number" step="0.01" v-model.number="form.oldPrice" placeholder="0.00" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-base text-rose-400 focus:border-rose-500 outline-none transition line-through decoration-rose-500/50">
               </div>
             </div>
 
+            <!-- Bewertungen -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label class="block text-xs font-semibold text-slate-400 mb-1.5">Bewertung (Sterne)</label>
-                <input type="number" step="0.1" min="0" max="5" v-model="form.ratingStars" placeholder="4.7" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-cyan-500 outline-none transition">
+                <input type="number" step="0.1" min="0" max="5" v-model="form.ratingStars" placeholder="z.B. 4.7" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-amber-400 outline-none transition">
               </div>
               <div>
                 <label class="block text-xs font-semibold text-slate-400 mb-1.5">Anzahl Bewertungen</label>
-                <input type="number" v-model="form.ratingCount" placeholder="1850" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-cyan-500 outline-none transition">
+                <input type="number" v-model="form.ratingCount" placeholder="z.B. 1850" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-amber-400 outline-none transition">
               </div>
             </div>
 
-            <div class="grid grid-cols-1 gap-4">
-              <div>
-                <label class="block text-xs font-semibold text-slate-400 mb-1.5">Deal Link</label>
-                <input type="url" v-model="form.link" placeholder="https://..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-cyan-400 focus:border-cyan-500 outline-none transition">
-              </div>
-            </div>
-
-            <!-- Händler Auswahl als Button-Liste mit Eigene Option ganz unten -->
+            <!-- STREAMING_CHUNK:Rendering Custom Selectors -->
+            <!-- Händler Auswahl -->
             <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1.5">Händler</label>
+              <label class="block text-xs font-semibold text-slate-400 mb-2">Händler</label>
               <div class="flex flex-wrap gap-2">
                 <button v-for="ret in optionsPool.retailers" :key="ret"
                   @click="form.retailer = (form.retailer === ret ? '' : ret)"
-                  :class="['px-3 py-1.5 rounded-lg text-xs font-semibold border transition', 
-                           form.retailer === ret ? 'bg-cyan-500 text-black border-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700']">
+                  :class="['px-3 py-1.5 rounded-lg text-xs font-medium border transition duration-200', 
+                           form.retailer === ret ? 'bg-cyan-500 text-black border-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.4)] font-bold' : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700 hover:border-slate-500']">
                   {{ ret }} <i v-if="form.retailer === ret" class="fa-solid fa-check ml-1 text-[10px]"></i>
                 </button>
                 
-                <!-- Eigene Option immer am Ende -->
-                <button v-if="!isAddingCustom('retailer')" @click="triggerCustomOption('retailer')" 
-                  class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-dashed border-slate-600 text-slate-400 hover:text-cyan-400 hover:border-cyan-400 transition">
-                  <i class="fa-solid fa-plus mr-1"></i> Eigene Option
+                <button v-if="!isAddingCustom('retailer')" @click="triggerCustomOption('retailer')" class="px-3 py-1.5 rounded-lg text-xs font-medium border border-dashed border-slate-600 text-slate-400 hover:text-cyan-400 hover:border-cyan-400 transition bg-slate-900/50">
+                  <i class="fa-solid fa-plus mr-1"></i> Eigener
                 </button>
-                
-                <div v-if="isAddingCustom('retailer')" class="flex items-center space-x-2">
-                  <input type="text" v-model="customInput['retailer']" @keyup.enter="saveCustomOption('retailer', 'retailers', false)" placeholder="Händler Name..." class="bg-slate-900 border border-cyan-500 rounded-lg px-2 py-1 text-xs text-white outline-none w-36">
-                  <button @click="saveCustomOption('retailer', 'retailers', false)" class="text-cyan-400 hover:text-cyan-300"><i class="fa-solid fa-check"></i></button>
-                  <button @click="cancelCustomOption('retailer')" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-xmark"></i></button>
+                <div v-if="isAddingCustom('retailer')" class="flex items-center space-x-1">
+                  <input type="text" v-model="customInput['retailer']" @keyup.enter="saveCustomOption('retailer', 'retailers', false)" placeholder="Name..." class="bg-slate-900 border border-cyan-500 rounded-lg px-2 py-1.5 text-xs text-white outline-none w-32 focus:ring-1 focus:ring-cyan-500">
+                  <button @click="saveCustomOption('retailer', 'retailers', false)" class="p-1.5 text-emerald-400 hover:bg-emerald-400/10 rounded"><i class="fa-solid fa-check"></i></button>
+                  <button @click="cancelCustomOption('retailer')" class="p-1.5 text-rose-400 hover:bg-rose-400/10 rounded"><i class="fa-solid fa-xmark"></i></button>
                 </div>
               </div>
             </div>
 
-            <!-- Versand Auswahl als Button-Liste -->
+            <!-- Versand Auswahl -->
             <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1.5">Versand</label>
+              <label class="block text-xs font-semibold text-slate-400 mb-2">Versand</label>
               <div class="flex flex-wrap gap-2">
                 <button v-for="ship in optionsPool.shipping" :key="ship" 
                   @click="form.shipping = ship"
-                  :class="['px-3 py-1.5 rounded-lg text-xs font-semibold border transition', 
-                           form.shipping === ship ? 'bg-cyan-500 text-black border-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700']">
+                  :class="['px-3 py-1.5 rounded-lg text-xs font-medium border transition duration-200', 
+                           form.shipping === ship ? 'bg-cyan-500 text-black border-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.4)] font-bold' : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700 hover:border-slate-500']">
                   {{ ship }} <i v-if="form.shipping === ship" class="fa-solid fa-check ml-1 text-[10px]"></i>
                 </button>
 
-                <!-- Eigene Option immer am Ende -->
-                <button v-if="!isAddingCustom('shipping')" @click="triggerCustomOption('shipping')" 
-                  class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-dashed border-slate-600 text-slate-400 hover:text-cyan-400 hover:border-cyan-400 transition">
-                  <i class="fa-solid fa-plus mr-1"></i> Eigene Option
+                <button v-if="!isAddingCustom('shipping')" @click="triggerCustomOption('shipping')" class="px-3 py-1.5 rounded-lg text-xs font-medium border border-dashed border-slate-600 text-slate-400 hover:text-cyan-400 hover:border-cyan-400 transition bg-slate-900/50">
+                  <i class="fa-solid fa-plus mr-1"></i> Eigener
                 </button>
-
-                <div v-if="isAddingCustom('shipping')" class="flex items-center space-x-2">
-                  <input type="text" v-model="customInput['shipping']" @keyup.enter="saveCustomOption('shipping', 'shipping', false)" placeholder="z.B. 2,99 €..." class="bg-slate-900 border border-cyan-500 rounded-lg px-2 py-1 text-xs text-white outline-none w-36">
-                  <button @click="saveCustomOption('shipping', 'shipping', false)" class="text-cyan-400 hover:text-cyan-300"><i class="fa-solid fa-check"></i></button>
-                  <button @click="cancelCustomOption('shipping')" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-xmark"></i></button>
+                <div v-if="isAddingCustom('shipping')" class="flex items-center space-x-1">
+                  <input type="text" v-model="customInput['shipping']" @keyup.enter="saveCustomOption('shipping', 'shipping', false)" placeholder="z.B. 2,99 €..." class="bg-slate-900 border border-cyan-500 rounded-lg px-2 py-1.5 text-xs text-white outline-none w-32 focus:ring-1 focus:ring-cyan-500">
+                  <button @click="saveCustomOption('shipping', 'shipping', false)" class="p-1.5 text-emerald-400 hover:bg-emerald-400/10 rounded"><i class="fa-solid fa-check"></i></button>
+                  <button @click="cancelCustomOption('shipping')" class="p-1.5 text-rose-400 hover:bg-rose-400/10 rounded"><i class="fa-solid fa-xmark"></i></button>
                 </div>
               </div>
             </div>
 
-            <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1.5">Hashtags</label>
-              <input type="text" v-model="form.hashtags" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-blue-400 focus:border-cyan-500 outline-none transition">
+            <!-- STREAMING_CHUNK:Rendering Date and Features (New QoL Improvements) -->
+            <!-- GÜLTIGKEIT (NEU FÜR ALLE KATEGORIEN) -->
+            <div class="bg-slate-800/30 p-4 rounded-xl border border-slate-700">
+              <label class="block text-xs font-bold text-cyan-400 mb-2 uppercase tracking-wide">
+                <i class="fa-regular fa-clock mr-1"></i> Gültig bis (Enddatum)
+              </label>
+              
+              <div class="flex flex-wrap gap-2 mb-3">
+                <button @click="form.validityType = 'date'" :class="form.validityType === 'date' ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-slate-800 text-slate-300 border-slate-600'" class="px-3 py-1.5 rounded-lg text-xs font-medium border transition">
+                  📅 Datum/Uhrzeit
+                </button>
+                <button @click="form.validityType = 'stock'" :class="form.validityType === 'stock' ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-slate-800 text-slate-300 border-slate-600'" class="px-3 py-1.5 rounded-lg text-xs font-medium border transition">
+                  📦 Solange Vorrat reicht
+                </button>
+                <button @click="form.validityType = 'today'" :class="form.validityType === 'today' ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-slate-800 text-slate-300 border-slate-600'" class="px-3 py-1.5 rounded-lg text-xs font-medium border transition">
+                  🌙 Nur heute
+                </button>
+                <button @click="form.validityType = 'none'" :class="form.validityType === 'none' ? 'bg-slate-600 text-white border-slate-500' : 'bg-slate-900 text-slate-500 border-slate-800'" class="px-3 py-1.5 rounded-lg text-xs font-medium border transition">
+                  ❌ Keine Angabe
+                </button>
+              </div>
+
+              <!-- Nativer Kalender -->
+              <Transition name="fade">
+                <div v-if="form.validityType === 'date'" class="mt-2">
+                  <input type="datetime-local" v-model="form.validityDate" class="w-full max-w-sm bg-slate-900 border border-slate-600 rounded-xl px-4 py-2 text-sm text-white focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none shadow-inner">
+                </div>
+              </Transition>
             </div>
+
+            <!-- HIGHLIGHTS / DEAL FEATURES (Automatisierte Texte) -->
+            <div>
+              <div class="flex justify-between items-end mb-2">
+                <label class="block text-xs font-semibold text-slate-400">Highlights / Features <span class="text-[10px] text-cyan-400 font-normal ml-1">(Mehrfachauswahl - wird auto-übersetzt)</span></label>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button v-for="feat in optionsPool.dealFeatures" :key="feat"
+                  @click="toggleFeature(feat)"
+                  :class="['px-3 py-1.5 rounded-lg text-xs font-medium border transition duration-200', 
+                           form.features.includes(feat) ? 'bg-blue-600/30 text-blue-300 border-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.3)]' : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700']">
+                  <i v-if="form.features.includes(feat)" class="fa-solid fa-check mr-1 text-[10px]"></i>{{ feat }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Link & Hashtags -->
+            <div class="grid grid-cols-1 gap-4 pt-2 border-t border-slate-800">
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1.5">Deal Link <span class="text-rose-400">*</span></label>
+                <div class="relative">
+                  <i class="fa-solid fa-link absolute left-3.5 top-3 text-slate-500"></i>
+                  <input type="url" v-model="form.link" placeholder="https://..." class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-cyan-400 focus:border-cyan-500 outline-none transition">
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1.5">Hashtags</label>
+                <input type="text" v-model="form.hashtags" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm text-blue-400/80 focus:border-cyan-500 outline-none transition">
+              </div>
+            </div>
+
           </div>
         </div>
 
-        <!-- Dynamische Felder je nach Kategorie -->
-        <div v-if="selectedCategory.dynamicFields && selectedCategory.dynamicFields.length > 0" class="glass-panel rounded-2xl p-5 border-cyan-900/50">
-          <h2 class="font-cyber text-lg font-bold text-white uppercase tracking-wider mb-4 flex items-center">
-            <i class="fa-solid fa-sliders text-cyan-400 mr-2"></i> {{ selectedCategory.name }} Spezifische Details
+        <!-- STREAMING_CHUNK:Rendering Dynamic Fields -->
+        <div v-if="selectedCategory.dynamicFields && selectedCategory.dynamicFields.length > 0" class="glass-panel rounded-2xl p-6 border-cyan-900/40 neon-glow">
+          <h2 class="font-cyber text-lg font-bold text-white uppercase tracking-wider mb-5 flex items-center">
+            <i class="fa-solid fa-sliders text-cyan-400 mr-2"></i> {{ selectedCategory.name }} Details
           </h2>
           
           <div class="space-y-5">
             <div v-for="field in selectedCategory.dynamicFields" :key="field.id">
               
-              <!-- Text Input -->
               <div v-if="field.type === 'text'">
                 <label class="block text-xs font-semibold text-slate-400 mb-1.5">{{ field.label }}</label>
-                <input type="text" v-model="form.dynamic[field.id]" :placeholder="field.placeholder" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm text-white focus:border-cyan-500 outline-none">
+                <input type="text" v-model="form.dynamic[field.id]" :placeholder="field.placeholder" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-cyan-500 outline-none">
               </div>
 
-              <!-- Options Selector (Mehrfachauswahl & Custom am Ende) -->
               <div v-if="field.type === 'options'">
-                <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center justify-between mb-2">
                   <label class="block text-xs font-semibold text-slate-400">
                     {{ field.label }} 
-                    <span v-if="field.multiSelect" class="text-[10px] text-cyan-400 font-normal ml-1">(Mehrfachauswahl möglich)</span>
+                    <span v-if="field.multiSelect" class="text-[10px] text-cyan-400 font-normal ml-1">(Mehrfachauswahl)</span>
                   </label>
                 </div>
                 <div class="flex flex-wrap gap-2">
-                  <!-- Option Buttons -->
                   <button v-for="opt in getOptionsList(field.optionsKey)" :key="opt" 
                     @click="toggleOption(field.id, opt, field.multiSelect)"
-                    :class="['px-3 py-1.5 rounded-lg text-xs font-semibold border transition', 
-                             isOptionSelected(field.id, opt, field.multiSelect) ? 'bg-cyan-500 text-black border-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700']">
+                    :class="['px-3 py-1.5 rounded-lg text-xs font-medium border transition', 
+                             isOptionSelected(field.id, opt, field.multiSelect) ? 'bg-cyan-500 text-black border-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.4)] font-bold' : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700']">
                     {{ opt }} <i v-if="isOptionSelected(field.id, opt, field.multiSelect)" class="fa-solid fa-check ml-1 text-[10px]"></i>
                   </button>
                   
-                  <!-- Add Custom Option Trigger AM ENDE DER LISTE -->
-                  <button v-if="!isAddingCustom(field.id)" @click="triggerCustomOption(field.id)" 
-                    class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-dashed border-slate-600 text-slate-400 hover:text-cyan-400 hover:border-cyan-400 transition">
-                    <i class="fa-solid fa-plus mr-1"></i> Eigene Option
+                  <button v-if="!isAddingCustom(field.id)" @click="triggerCustomOption(field.id)" class="px-3 py-1.5 rounded-lg text-xs font-medium border border-dashed border-slate-600 text-slate-400 hover:text-cyan-400 hover:border-cyan-400 transition bg-slate-900/50">
+                    <i class="fa-solid fa-plus mr-1"></i> Eigener
                   </button>
                   
-                  <!-- Input for new Custom Option -->
-                  <div v-if="isAddingCustom(field.id)" class="flex items-center space-x-2">
-                    <input type="text" v-model="customInput[field.id]" @keyup.enter="saveCustomOption(field.id, field.optionsKey, field.multiSelect)" placeholder="Wert eingeben..." class="bg-slate-900 border border-cyan-500 rounded-lg px-2 py-1 text-xs text-white outline-none w-36">
-                    <button @click="saveCustomOption(field.id, field.optionsKey, field.multiSelect)" class="text-cyan-400 hover:text-cyan-300"><i class="fa-solid fa-check"></i></button>
-                    <button @click="cancelCustomOption(field.id)" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-xmark"></i></button>
+                  <div v-if="isAddingCustom(field.id)" class="flex items-center space-x-1">
+                    <input type="text" v-model="customInput[field.id]" @keyup.enter="saveCustomOption(field.id, field.optionsKey, field.multiSelect)" placeholder="Wert..." class="bg-slate-900 border border-cyan-500 rounded-lg px-2 py-1.5 text-xs text-white outline-none w-32 focus:ring-1 focus:ring-cyan-500">
+                    <button @click="saveCustomOption(field.id, field.optionsKey, field.multiSelect)" class="p-1.5 text-emerald-400 hover:bg-emerald-400/10 rounded"><i class="fa-solid fa-check"></i></button>
+                    <button @click="cancelCustomOption(field.id)" class="p-1.5 text-rose-400 hover:bg-rose-400/10 rounded"><i class="fa-solid fa-xmark"></i></button>
                   </div>
                 </div>
               </div>
@@ -248,44 +302,56 @@
           </div>
         </div>
 
-        <!-- Zusätzliche Infos -->
-        <div class="glass-panel rounded-2xl p-5">
-          <label class="block text-xs font-semibold text-slate-400 mb-1.5">Zusätzliche Infos / Gutscheincode</label>
-          <textarea v-model="form.additionalInfo" rows="2" placeholder="z.B. Gutscheincode DEALS20 im Warenkorb eingeben..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-cyan-500 outline-none transition"></textarea>
+        <!-- Manuelle Zusatzinfos (Fallback) -->
+        <div class="glass-panel rounded-2xl p-6">
+          <label class="block text-xs font-semibold text-slate-400 mb-2">Manuelle Zusatzinfo (Wird <span class="text-rose-400 font-bold">NICHT</span> automatisch übersetzt)</label>
+          <textarea v-model="form.additionalInfo" rows="2" placeholder="Nur für spezielle Hinweise nutzen, die nicht durch Features abgedeckt sind..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-300 focus:border-cyan-500 outline-none transition resize-none"></textarea>
         </div>
 
       </div>
 
+      <!-- STREAMING_CHUNK:Rendering Telegram Preview -->
       <!-- RIGHT COLUMN: Vorschau -->
       <div class="lg:col-span-5 space-y-6 lg:sticky lg:top-20">
         
-        <div class="glass-panel rounded-2xl p-5 flex flex-col h-full border-cyan-900/30 neon-glow">
-          <div class="flex items-center justify-between mb-4">
+        <div class="glass-panel rounded-2xl p-1 flex flex-col h-full border-cyan-900/30 shadow-2xl">
+          
+          <div class="px-5 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/50 rounded-t-2xl">
             <h2 class="font-cyber text-lg font-bold text-white uppercase flex items-center">
-              <i class="fa-brands fa-telegram text-sky-400 mr-2"></i> Live Telegram Post
+              <i class="fa-brands fa-telegram text-[#2AABEE] mr-2 text-xl"></i> Telegram Preview
             </h2>
+            <label class="flex items-center space-x-2 cursor-pointer text-xs text-slate-400 hover:text-white transition group">
+              <input type="checkbox" v-model="rawEditMode" @change="syncEditMode" class="form-checkbox bg-slate-900 border-slate-700 rounded text-cyan-500 cursor-pointer">
+              <span class="group-hover:text-cyan-400">Code Editor Modus</span>
+            </label>
           </div>
 
-          <!-- Telegram Preview Box -->
-          <div class="bg-cyber-tg rounded-xl p-4 border border-slate-800 flex-1 relative font-sans text-sm text-slate-200 leading-relaxed overflow-y-auto" style="max-height: 600px;">
-            <div v-if="!rawEditMode" class="whitespace-pre-wrap">{{ generatedPost }}</div>
-            <textarea v-else v-model="editablePost" class="w-full h-full min-h-[420px] bg-transparent text-slate-200 resize-none outline-none whitespace-pre-wrap font-mono text-xs"></textarea>
+          <!-- Telegram Chat Bubble Layout -->
+          <div class="bg-cyber-tgBg flex-1 p-4 overflow-y-auto" style="min-height: 500px; max-height: 700px; background-image: radial-gradient(#1e293b 1px, transparent 1px); background-size: 20px 20px;">
+            
+            <div v-if="!rawEditMode" class="w-full max-w-[95%] bg-cyber-tgBubble rounded-2xl rounded-bl-sm p-4 shadow-md border border-slate-700/50 relative">
+              <!-- Decorative Telegram Tail -->
+              <svg viewBox="0 0 11 20" class="absolute -left-[10px] bottom-0 w-[11px] h-[20px] text-cyber-tgBubble fill-current drop-shadow-sm">
+                <path d="M11 0C11 0 11 20 11 20C11 20 0 20 0 20C5 20 11 0 11 0Z"/>
+              </svg>
+              
+              <div class="whitespace-pre-wrap font-sans text-[13px] sm:text-sm text-slate-100 leading-[1.6] break-words">{{ generatedPost }}</div>
+              
+              <div class="text-right text-[10px] text-slate-400 mt-2 select-none flex justify-end items-center space-x-1">
+                <span>{{ currentTime }}</span>
+                <i class="fa-solid fa-check-double text-cyan-500"></i>
+              </div>
+            </div>
+
+            <!-- RAW Textarea -->
+            <textarea v-else v-model="editablePost" class="w-full h-full min-h-[500px] bg-slate-900/80 border border-slate-700 rounded-xl p-4 text-slate-200 resize-none outline-none whitespace-pre-wrap font-mono text-xs focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition shadow-inner"></textarea>
           </div>
 
           <!-- Actions -->
-          <div class="mt-4 space-y-3">
-            <div class="flex justify-between items-center px-1">
-              <label class="flex items-center space-x-2 cursor-pointer text-xs text-slate-400 hover:text-white transition">
-                <input type="checkbox" v-model="rawEditMode" @change="syncEditMode" class="form-checkbox bg-slate-900 border-slate-700 rounded text-cyan-500">
-                <span>Manueller Bearbeitungsmodus</span>
-              </label>
-            </div>
-
-            <div class="grid grid-cols-1 gap-3">
-              <button @click="copyToClipboard" :disabled="!canGenerate" :class="!canGenerate ? 'opacity-50 cursor-not-allowed grayscale' : 'hover:from-cyan-400 hover:to-blue-500'" class="py-3 px-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-bold text-sm uppercase rounded-xl transition flex justify-center items-center space-x-2 shadow-lg shadow-cyan-500/20">
-                <i class="fa-solid fa-copy"></i><span>In Zwischenablage kopieren</span>
-              </button>
-            </div>
+          <div class="p-4 bg-slate-900/50 rounded-b-2xl border-t border-slate-800">
+            <button @click="copyToClipboard" :disabled="!canGenerate" :class="!canGenerate ? 'opacity-50 cursor-not-allowed grayscale' : 'hover:from-cyan-400 hover:to-blue-500 active:scale-[0.98]'" class="w-full py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-bold text-sm uppercase rounded-xl transition-all duration-200 flex justify-center items-center space-x-2 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+              <i class="fa-regular fa-copy text-lg"></i><span>Kopieren & Posten</span>
+            </button>
           </div>
 
         </div>
@@ -293,94 +359,116 @@
     </div>
   </main>
 
-  <!-- MODAL: Eigene Optionen Warnung -->
-  <Transition name="fade">
-    <div v-if="showWarningModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div class="bg-cyber-card border border-rose-500/30 rounded-2xl max-w-md w-full p-6 shadow-[0_0_30px_rgba(244,63,94,0.15)]">
-        <div class="flex items-center space-x-3 text-rose-400 mb-4">
-          <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
-          <h3 class="font-cyber text-xl font-bold uppercase">Sicherheitswarnung</h3>
-        </div>
-        <p class="text-sm text-slate-300 leading-relaxed mb-6">
-          Individuelle Werte können zu falschen oder uneinheitlichen Angaben im Feed und bei der automatischen Übersetzung führen. Möchtest du diese Funktion wirklich aktivieren?
-        </p>
-        <div class="flex space-x-3">
-          <button @click="showWarningModal = false" class="flex-1 py-2.5 bg-slate-800 text-white font-semibold text-sm rounded-xl hover:bg-slate-700 transition">
-            ❌ Abbrechen
-          </button>
-          <button @click="confirmCustomUnlock" class="flex-1 py-2.5 bg-rose-500/20 text-rose-400 border border-rose-500/50 font-semibold text-sm rounded-xl hover:bg-rose-500 hover:text-white transition">
-            ✅ Trotzdem aktivieren
-          </button>
-        </div>
-      </div>
-    </div>
-  </Transition>
-
+  <!-- STREAMING_CHUNK:Rendering Toast Component -->
   <!-- Toast Message -->
   <Transition name="fade">
-    <div v-if="toast.show" class="fixed bottom-6 right-6 z-50 bg-slate-800 border border-cyan-500 text-white px-5 py-3 rounded-xl shadow-2xl text-sm font-semibold flex items-center space-x-3">
-      <i class="fa-solid fa-circle-check text-cyan-400"></i>
+    <div v-if="toast.show" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-emerald-500/90 backdrop-blur-md border border-emerald-400 text-white px-6 py-3 rounded-full shadow-2xl shadow-emerald-500/20 text-sm font-bold flex items-center space-x-3">
+      <i class="fa-solid fa-circle-check text-lg"></i>
       <span>{{ toast.message }}</span>
     </div>
   </Transition>
 
 </div>
 
+<!-- STREAMING_CHUNK:Initializing Vue Logic -->
 <script>
-const { createApp, ref, computed, reactive } = Vue;
+const { createApp, ref, computed, reactive, onMounted } = Vue;
 
 createApp({
   setup() {
     // --- TRANSLATION DICTIONARY (DE -> EN) ---
+    // Massive Erweiterung für reibungslose Übersetzung
     const translationDict = {
-      // Zustände
-      'Neu': 'New', 'Wie neu': 'Like new', 'Sehr gut': 'Very good condition', 'Gut': 'Good condition', 'Gebraucht': 'Used',
-      // Versand
-      'Kostenlos': 'Free', 'Abholung': 'Pick-up only',
-      // Garantie
-      'Keine Garantie': 'No warranty', '3 Monate': '3 months', '6 Monate': '6 months', '12 Monate': '12 months', '24 Monate': '24 months',
       // Kategorien
       'Normaler Deal': 'Standard Deal', 'Deal of the Day': 'Deal of the Day', 'Flash Deal': 'Flash Deal',
       'Freebie / Gratis': 'Freebie / Free', 'Neuerscheinung': 'New Release', 'Gaming Deal': 'Gaming Deal',
       'Smartphone Deal': 'Smartphone Deal', 'Hardware Deal': 'Hardware Deal', 'Software Deal': 'Software Deal',
       'Haushalt Deal': 'Household Deal', 'Sonstige Produkte': 'Other Products',
+      
+      // Zustände
+      'Neu': 'New', 'Wie neu': 'Like new', 'Sehr gut': 'Very good', 'Gut': 'Good', 'Gebraucht': 'Used',
+      'Generalüberholt (Refurbished)': 'Refurbished', 'B-Ware': 'B-Stock', 'Akzeptabel': 'Acceptable',
+      
+      // Versand
+      'Kostenlos': 'Free', 'Kostenlos mit Prime': 'Free with Prime', 'Abholung': 'Pick-up only',
+      
+      // Garantie
+      'Keine Garantie': 'No warranty', 'Keine': 'None', '1 Monat': '1 month', '3 Monate': '3 months', '6 Monate': '6 months', 
+      '12 Monate': '12 months', '24 Monate': '24 months', '36 Monate': '36 months', 'Lebenslang': 'Lifetime',
+      
+      // Hardware
+      'CPU': 'CPU', 'GPU': 'GPU', 'RAM': 'RAM', 'SSD': 'SSD', 'Mainboard': 'Motherboard', 'Monitor': 'Monitor', 
+      'Netzteil': 'Power Supply', 'Gehäuse': 'PC Case', 'Notebook': 'Laptop', 'Zubehör': 'Accessories',
+      
+      // Game Genres
+      'Action': 'Action', 'RPG': 'RPG', 'Shooter': 'Shooter', 'Sport': 'Sports', 'Strategie': 'Strategy', 
+      'Simulator': 'Simulation', 'Adventure': 'Adventure', 'Rennspiel': 'Racing',
+      
+      // Game product types
+      'Spiel': 'Game', 'DLC': 'DLC', 'Konsole': 'Console', 'Controller': 'Controller',
+      
       // SIM Types
       'Dual-SIM': 'Dual SIM', 'eSIM': 'eSIM', 'Single-SIM + eSIM': 'Single SIM + eSIM', 'Nano-SIM': 'Nano SIM',
+      
       // Software Types
       'Antivirus & Sicherheit': 'Antivirus & Security', 'Office & Produktivität': 'Office & Productivity',
       'VPN': 'VPN', 'Grafik & Video': 'Graphics & Video', 'Betriebssystem': 'Operating System', 'Cloud-Speicher': 'Cloud Storage',
+      
       // License Types
       '1-Jahres-Lizenz': '1-Year License', 'Lebenslange Lizenz (Lifetime)': 'Lifetime License', 'Monats-Abo': 'Monthly Subscription', 'Einmalkauf (Lizenzschlüssel)': 'One-time purchase',
+      
       // Devices
       '1 Gerät': '1 Device', '3 Geräte': '3 Devices', '5 Geräte': '5 Devices', '10 Geräte': '10 Devices', 'Unbegrenzt (PC & Mac)': 'Unlimited (PC & Mac)',
+      
       // Household
       'Saugroboter': 'Robot Vacuum', 'Kaffeemaschine': 'Coffee Machine', 'Airfryer / Heißluftfritteuse': 'Air Fryer',
       'Küchenmaschine': 'Food Processor', 'Smart Home & Licht': 'Smart Home & Lighting', 'Werkzeug': 'Tools', 'Waschmaschine': 'Washing Machine',
+      
       // Freebies
       'Gratis-Produkt': 'Free Product', 'Kostenloses Spiel': 'Free Game', 'Test-Abo': 'Free Trial', 'Gutschein / Coupon': 'Voucher / Coupon',
-      'Keine Registrierung nötig': 'No registration required', 'Kostenloser Account erforderlich': 'Free account required', 'Nur für Neukunden': 'New customers only',
-      // Durations
-      'Nur heute': 'Today only', 'Bis 23:59 Uhr': 'Until 23:59', 'Blitzangebot': 'Lightning Deal', 'Nur wenige Stunden': 'Only a few hours', 'Solange der Vorrat reicht': 'While stocks last'
+      'Keine Registrierung nötig': 'No registration required', 'Kostenloser Account erforderlich': 'Free account required', 
+      'Nur für Neukunden': 'New customers only', 'Mit Code-Eingabe': 'Code entry required',
+      
+      // Editions
+      'Standard Edition': 'Standard Edition', 'Deluxe Edition': 'Deluxe Edition', "Collector's Edition": "Collector's Edition", 'GOTY Edition': 'GOTY Edition',
+      
+      // Other categories
+      'Mode & Accessoires': 'Fashion & Accessories', 'Sport & Outdoor': 'Sports & Outdoor', 'Garten & Heimwerken': 'Garden & DIY', 
+      'Auto & Motorrad': 'Car & Motorcycle', 'Spielzeug & Hobby': 'Toys & Hobbies', 'Gutscheine': 'Vouchers',
+
+      // Highlights / Features (NEU)
+      'Historischer Tiefpreis': 'All-time low price',
+      'Bestpreis': 'Best price available',
+      'Nur für Prime-Mitglieder': 'Prime members only',
+      'Gutschein auf der Artikelseite aktivieren': 'Activate coupon on product page',
+      'Cashback möglich': 'Cashback available',
+      'Versandkostenfrei ab 29€': 'Free shipping on orders over 29€',
+      'Versandkostenfrei ab 39€': 'Free shipping on orders over 39€',
+      'Vorbestellung': 'Pre-order',
+      'Limitierte Stückzahl': 'Limited quantity available'
     };
 
     const translate = (deText) => {
       if(!deText) return '';
       if(translationDict[deText]) return translationDict[deText];
-      if(typeof deText === 'string' && deText.includes('€')) return deText.replace(',', '.'); 
-      return deText;
+      // Fallback für Preise etc. in Strings
+      if(typeof deText === 'string' && deText.includes('€')) return deText.replace(',', '.').replace('€', '€'); 
+      return deText; // Unbekanntes einfach durchreichen
     };
 
     // --- OPTIONS POOL ---
     const optionsPool = reactive({
-      retailers: ['Amazon', 'MediaMarkt', 'Saturn', 'Mindfactory', 'eBay', 'Otto', 'Alternate', 'Cyberport', 'NBB', 'Coolblue'],
-      conditions: ['Neu', 'Wie neu', 'Sehr gut', 'Gut', 'Gebraucht'],
-      shipping: ['Kostenlos', '3,90 €', '4,99 €', 'Abholung'],
-      warranty: ['Keine Garantie', '3 Monate', '6 Monate', '12 Monate', '24 Monate'],
+      retailers: ['Amazon', 'MediaMarkt', 'Saturn', 'Mindfactory', 'eBay', 'Otto', 'Alternate', 'Cyberport', 'NBB', 'Coolblue', 'Steam', 'Epic Games', 'AliExpress'],
+      conditions: ['Neu', 'Wie neu', 'Sehr gut', 'Gut', 'Gebraucht', 'Generalüberholt (Refurbished)', 'B-Ware', 'Akzeptabel'],
+      shipping: ['Kostenlos', 'Kostenlos mit Prime', '1,99 €', '2,99 €', '3,90 €', '3,99 €', '4,99 €', '5,99 €', 'Abholung'],
+      warranty: ['Keine', '1 Monat', '3 Monate', '6 Monate', '12 Monate', '24 Monate', '36 Monate', 'Lebenslang'],
+      dealFeatures: ['Historischer Tiefpreis', 'Bestpreis', 'Nur für Prime-Mitglieder', 'Gutschein auf der Artikelseite aktivieren', 'Cashback möglich', 'Versandkostenfrei ab 29€', 'Versandkostenfrei ab 39€', 'Vorbestellung', 'Limitierte Stückzahl'],
+      
       platforms: ['PC', 'PS5', 'Xbox Series X/S', 'PS4', 'Xbox One', 'Nintendo Switch'],
       gameTypes: ['Spiel', 'DLC', 'Zubehör', 'Konsole', 'Controller'],
       genres: ['Action', 'RPG', 'Shooter', 'Sport', 'Strategie', 'Simulator', 'Adventure', 'Rennspiel'],
       hwCategories: ['CPU', 'GPU', 'RAM', 'SSD', 'Mainboard', 'Monitor', 'Netzteil', 'Gehäuse', 'Notebook', 'Zubehör'],
-      brands: ['Apple', 'Samsung', 'Xiaomi', 'Google', 'Sony', 'Asus', 'Lenovo', 'LG', 'Philips', 'Bosch', 'Dyson'],
+      brands: ['Apple', 'Samsung', 'Xiaomi', 'Google', 'Sony', 'Asus', 'Lenovo', 'LG', 'Philips', 'Bosch', 'Dyson', 'Nintendo', 'Microsoft'],
       storage: ['64 GB', '128 GB', '256 GB', '512 GB', '1 TB', '2 TB'],
       colors: ['Schwarz', 'Silber', 'Space Grau', 'Titan', 'Weiß', 'Mitternacht', 'Blau', 'Grün'],
       simTypes: ['Dual-SIM', 'eSIM', 'Single-SIM + eSIM', 'Nano-SIM'],
@@ -388,27 +476,25 @@ createApp({
       licenseTypes: ['1-Jahres-Lizenz', 'Lebenslange Lizenz (Lifetime)', 'Monats-Abo', 'Einmalkauf (Lizenzschlüssel)'],
       deviceCounts: ['1 Gerät', '3 Geräte', '5 Geräte', '10 Geräte', 'Unbegrenzt (PC & Mac)'],
       householdCategories: ['Saugroboter', 'Kaffeemaschine', 'Airfryer / Heißluftfritteuse', 'Küchenmaschine', 'Smart Home & Licht', 'Werkzeug', 'Waschmaschine'],
-      dealDurations: ['Nur heute', 'Bis 23:59 Uhr', 'Blitzangebot', 'Nur wenige Stunden', 'Solange der Vorrat reicht'],
       freebieTypes: ['Gratis-Produkt', 'Kostenloses Spiel', 'Test-Abo', 'Gutschein / Coupon'],
       freebieRequirements: ['Keine Registrierung nötig', 'Kostenloser Account erforderlich', 'Nur für Neukunden', 'Mit Code-Eingabe'],
       editions: ['Standard Edition', 'Deluxe Edition', "Collector's Edition", 'GOTY Edition'],
       otherCategories: ['Mode & Accessoires', 'Sport & Outdoor', 'Garten & Heimwerken', 'Auto & Motorrad', 'Spielzeug & Hobby', 'Gutscheine']
     });
 
-    // --- 11 CATEGORIES DEFINITION (WITH CAPS LOCK HEADERS) ---
+    // --- STREAMING_CHUNK:Defining Categories Data ---
+    // 11 CATEGORIES DEFINITION (Kein timeLimit mehr in dyn fields, da jetzt global)
     const categories = [
       { id: 'normal', name: 'Normaler Deal', icon: '🔥', headerDE: '🔥 DEAL ALERT | ANGEBOT', headerEN: '🔥 DEAL ALERT | OFFER', hashtags: '#CyberDealz #Deal #Offer', dynamicFields: [] },
       
       { id: 'dotd', name: 'Deal of the Day', icon: '🏆', headerDE: '🏆 DEAL OF THE DAY | TAGESANGEBOT', headerEN: '🏆 DEAL OF THE DAY | OFFER', hashtags: '#CyberDealz #DealOfTheDay #Tagesangebot',
         dynamicFields: [
-          { id: 'timeLimit', label: 'Gültigkeitsdauer', type: 'options', optionsKey: 'dealDurations' },
           { id: 'condition', label: 'Zustand', type: 'options', optionsKey: 'conditions' }
         ]
       },
 
       { id: 'flash', name: 'Flash Deal', icon: '⚡', headerDE: '⚡ FLASH DEAL | BLITZANGEBOT', headerEN: '⚡ FLASH DEAL | LIMITED OFFER', hashtags: '#CyberDealz #FlashDeal #Blitzangebot #LimitedTime',
         dynamicFields: [
-          { id: 'timeLimit', label: 'Zeitlimit / Vorrat', type: 'options', optionsKey: 'dealDurations' },
           { id: 'condition', label: 'Zustand', type: 'options', optionsKey: 'conditions' }
         ]
       },
@@ -416,16 +502,15 @@ createApp({
       { id: 'freebie', name: 'Freebie / Gratis', icon: '🆓', headerDE: '🆓 FREEBIE | GRATIS ANGEBOT', headerEN: '🆓 FREEBIE | FREE OFFER', hashtags: '#CyberDealz #Freebie #Gratis #Kostenlos',
         dynamicFields: [
           { id: 'freebieType', label: 'Angebot-Art', type: 'options', optionsKey: 'freebieTypes' },
-          { id: 'requirement', label: 'Voraussetzung', type: 'options', optionsKey: 'freebieRequirements' },
-          { id: 'timeLimit', label: 'Gültigkeit', type: 'options', optionsKey: 'dealDurations' }
+          { id: 'requirement', label: 'Voraussetzung', type: 'options', optionsKey: 'freebieRequirements' }
         ]
       },
 
       { id: 'newrelease', name: 'Neuerscheinung', icon: '🆕', headerDE: '🆕 NEUERSCHEINUNG | HIGHLIGHT', headerEN: '🆕 NEW RELEASE | HIGHLIGHT', hashtags: '#CyberDealz #Neuerscheinung #NewRelease #PreOrder',
         dynamicFields: [
           { id: 'brand', label: 'Hersteller / Publisher', type: 'options', optionsKey: 'brands' },
-          { id: 'edition', label: 'Edition', type: 'options', optionsKey: 'editions' },
-          { id: 'releaseDate', label: 'Release Datum', type: 'text', placeholder: 'z.B. Ab sofort / 15.10.2026' }
+          { id: 'edition', label: 'Edition', type: 'options', optionsKey: 'editions' }
+          // releaseDate entfernt, da global validDate auch als Release Date nutzbar ist, oder wir lassen es als Text, aber Valid Until ist meist besser.
         ]
       },
 
@@ -483,23 +568,34 @@ createApp({
       }
     ];
 
-    // --- REACTIVE STATE ---
+    // --- STREAMING_CHUNK:Setting up Reactive State ---
     const selectedCategory = ref(categories[0]);
     const form = reactive({
       title: '', newPrice: null, oldPrice: null, ratingStars: '', ratingCount: '',
       link: '', retailer: '', hashtags: categories[0].hashtags, additionalInfo: '',
       shipping: 'Kostenlos',
+      validityType: 'none', // 'none', 'date', 'stock', 'today'
+      validityDate: '',
+      features: [], // array of selected highlight features
       dynamic: {}
     });
 
     const rawEditMode = ref(false);
     const editablePost = ref('');
     const toast = ref({ show: false, message: '' });
+    const currentTime = ref('');
 
-    // Custom Options System State
-    const customOptionsUnlocked = ref(false);
-    const showWarningModal = ref(false);
-    const pendingCustomFieldId = ref(null);
+    onMounted(() => {
+      updateTime();
+      setInterval(updateTime, 60000);
+    });
+
+    const updateTime = () => {
+      const d = new Date();
+      currentTime.value = d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+    };
+
+    // Custom Options System State (Vereinfacht - ohne Warnmodal)
     const activeCustomInputs = reactive({});
     const customInput = reactive({});
 
@@ -514,47 +610,29 @@ createApp({
 
     const toggleOption = (fieldId, opt, isMultiSelect = false) => {
       if (isMultiSelect) {
-        if (!Array.isArray(form.dynamic[fieldId])) {
-          form.dynamic[fieldId] = [];
-        }
+        if (!Array.isArray(form.dynamic[fieldId])) form.dynamic[fieldId] = [];
         const index = form.dynamic[fieldId].indexOf(opt);
-        if (index > -1) {
-          form.dynamic[fieldId].splice(index, 1);
-        } else {
-          form.dynamic[fieldId].push(opt);
-        }
+        if (index > -1) form.dynamic[fieldId].splice(index, 1);
+        else form.dynamic[fieldId].push(opt);
       } else {
-        if (form.dynamic[fieldId] === opt) {
-          form.dynamic[fieldId] = '';
-        } else {
-          form.dynamic[fieldId] = opt;
-        }
+        if (form.dynamic[fieldId] === opt) form.dynamic[fieldId] = '';
+        else form.dynamic[fieldId] = opt;
       }
+    };
+    
+    const toggleFeature = (feat) => {
+      const idx = form.features.indexOf(feat);
+      if (idx > -1) form.features.splice(idx, 1);
+      else form.features.push(feat);
     };
 
     const isOptionSelected = (fieldId, opt, isMultiSelect = false) => {
-      if (isMultiSelect) {
-        return Array.isArray(form.dynamic[fieldId]) && form.dynamic[fieldId].includes(opt);
-      }
+      if (isMultiSelect) return Array.isArray(form.dynamic[fieldId]) && form.dynamic[fieldId].includes(opt);
       return form.dynamic[fieldId] === opt;
     };
 
     const triggerCustomOption = (fieldId) => {
-      if (customOptionsUnlocked.value) {
-        activeCustomInputs[fieldId] = true;
-      } else {
-        pendingCustomFieldId.value = fieldId;
-        showWarningModal.value = true;
-      }
-    };
-
-    const confirmCustomUnlock = () => {
-      customOptionsUnlocked.value = true;
-      showWarningModal.value = false;
-      if (pendingCustomFieldId.value) {
-        activeCustomInputs[pendingCustomFieldId.value] = true;
-        pendingCustomFieldId.value = null;
-      }
+      activeCustomInputs[fieldId] = true;
     };
 
     const isAddingCustom = (fieldId) => !!activeCustomInputs[fieldId];
@@ -562,20 +640,18 @@ createApp({
     const saveCustomOption = (fieldId, optionsKey, isMultiSelect = false) => {
       const val = customInput[fieldId]?.trim();
       if (val) {
+        // Speichere in Pool falls neu
         if (optionsPool[optionsKey] && !optionsPool[optionsKey].includes(val)) {
           optionsPool[optionsKey].push(val);
         }
+        // Weise Wert zu
         if (fieldId === 'retailer') {
           form.retailer = val;
         } else if (fieldId === 'shipping') {
           form.shipping = val;
         } else if (isMultiSelect) {
-          if (!Array.isArray(form.dynamic[fieldId])) {
-            form.dynamic[fieldId] = [];
-          }
-          if (!form.dynamic[fieldId].includes(val)) {
-            form.dynamic[fieldId].push(val);
-          }
+          if (!Array.isArray(form.dynamic[fieldId])) form.dynamic[fieldId] = [];
+          if (!form.dynamic[fieldId].includes(val)) form.dynamic[fieldId].push(val);
         } else {
           form.dynamic[fieldId] = val;
         }
@@ -588,7 +664,7 @@ createApp({
       customInput[fieldId] = '';
     };
 
-    // --- CALCULATIONS ---
+    // --- STREAMING_CHUNK:Implementing Calculations and Formatting ---
     const canGenerate = computed(() => form.title.trim().length > 0 && form.newPrice !== null && form.newPrice >= 0);
 
     const discountInfo = computed(() => {
@@ -601,7 +677,7 @@ createApp({
     });
 
     const formatPrice = (val) => (val !== null && val !== undefined && val !== '') ? parseFloat(val).toFixed(2).replace('.', ',') + ' €' : '';
-
+    
     const formatVal = (val) => {
       if (Array.isArray(val)) return val.join(', ');
       return val || '';
@@ -611,10 +687,25 @@ createApp({
       if (Array.isArray(val)) return val.map(v => translate(v)).join(', ');
       return translate(val);
     };
+    
+    // Datumsformatierung
+    const formatDateDE = (isoString) => {
+        if(!isoString) return '';
+        const d = new Date(isoString);
+        if(isNaN(d.getTime())) return isoString;
+        return d.toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' Uhr';
+    };
+    
+    const formatDateEN = (isoString) => {
+        if(!isoString) return '';
+        const d = new Date(isoString);
+        if(isNaN(d.getTime())) return isoString;
+        return d.toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+    };
 
-    // --- TEMPLATE GENERATOR ---
+    // --- STREAMING_CHUNK:Implementing Template Generation ---
     const generatedPost = computed(() => {
-      if (!canGenerate.value) return "Bitte Produktname und neuen Preis eingeben...";
+      if (!canGenerate.value) return "Warte auf Eingabe... Bitte Produktname und Preis ausfüllen.";
 
       const d = form;
       const dyn = form.dynamic;
@@ -629,6 +720,26 @@ createApp({
         ratingStrDE = `\n⭐ Bewertung:\n${d.ratingStars} ⭐ ${d.ratingCount ? '| ' + d.ratingCount + ' Bewertungen' : ''}\n`;
         ratingStrEN = `\n⭐ Rating:\n${d.ratingStars} ⭐ ${d.ratingCount ? '| ' + d.ratingCount + ' reviews' : ''}\n`;
       }
+      
+      // Gültigkeit / Enddatum verarbeiten
+      let validityDE = ''; let validityEN = '';
+      if (d.validityType === 'date' && d.validityDate) {
+          validityDE = formatDateDE(d.validityDate);
+          validityEN = formatDateEN(d.validityDate);
+      } else if (d.validityType === 'stock') {
+          validityDE = 'Solange der Vorrat reicht';
+          validityEN = 'While stocks last';
+      } else if (d.validityType === 'today') {
+          validityDE = 'Nur heute bis 23:59 Uhr';
+          validityEN = 'Today only until 11:59 PM';
+      }
+
+      // Highlights verarbeiten
+      let featuresDE = ''; let featuresEN = '';
+      if (d.features && d.features.length > 0) {
+          featuresDE = `\n✨ Highlights:\n` + d.features.map(f => `• ${f}`).join('\n') + `\n`;
+          featuresEN = `\n✨ Highlights:\n` + d.features.map(f => `• ${translate(f)}`).join('\n') + `\n`;
+      }
 
       // Dynamische Felder Text aufbauen
       let extraDe = ''; let extraEn = '';
@@ -636,54 +747,69 @@ createApp({
       if(dyn.condition) { extraDe += `📦 Zustand:\n${formatVal(dyn.condition)}\n\n`; extraEn += `📦 Condition:\n${translateVal(dyn.condition)}\n\n`; }
       if(dyn.warranty) { extraDe += `🛡 Garantie:\n${formatVal(dyn.warranty)}\n\n`; extraEn += `🛡 Warranty:\n${translateVal(dyn.warranty)}\n\n`; }
       if(dyn.storage) { extraDe += `💾 Speicher:\n${formatVal(dyn.storage)}\n\n`; extraEn += `💾 Storage:\n${formatVal(dyn.storage)}\n\n`; }
-      if(dyn.color) { extraDe += `🎨 Farbe:\n${formatVal(dyn.color)}\n\n`; extraEn += `🎨 Color:\n${formatVal(dyn.color)}\n\n`; }
+      if(dyn.color) { extraDe += `🎨 Farbe:\n${formatVal(dyn.color)}\n\n`; extraEn += `🎨 Color:\n${translateVal(dyn.color)}\n\n`; }
       if(dyn.simType) { extraDe += `📶 SIM-Typ:\n${formatVal(dyn.simType)}\n\n`; extraEn += `📶 SIM Type:\n${translateVal(dyn.simType)}\n\n`; }
       if(dyn.platform) { extraDe += `🎮 Plattform:\n${formatVal(dyn.platform)}\n\n`; extraEn += `🎮 Platform:\n${translateVal(dyn.platform)}\n\n`; }
       if(dyn.productType) { extraDe += `🕹️ Produktart:\n${formatVal(dyn.productType)}\n\n`; extraEn += `🕹️ Type:\n${translateVal(dyn.productType)}\n\n`; }
       if(dyn.genre) { extraDe += `🎭 Genre:\n${formatVal(dyn.genre)}\n\n`; extraEn += `🎭 Genre:\n${translateVal(dyn.genre)}\n\n`; }
       if(dyn.hwCat) { extraDe += `⚙️ Komponente:\n${formatVal(dyn.hwCat)}\n\n`; extraEn += `⚙️ Component:\n${translateVal(dyn.hwCat)}\n\n`; }
-      if(dyn.softwareType) { extraDe += `💻 Software-Art:\n${formatVal(dyn.softwareType)}\n\n`; extraEn += `💻 Software Type:\n${translateVal(dyn.softwareType)}\n\n`; }
+      if(dyn.softwareType) { extraDe += `💻 Software:\n${formatVal(dyn.softwareType)}\n\n`; extraEn += `💻 Software:\n${translateVal(dyn.softwareType)}\n\n`; }
       if(dyn.licenseType) { extraDe += `🔑 Lizenz:\n${formatVal(dyn.licenseType)}\n\n`; extraEn += `🔑 License:\n${translateVal(dyn.licenseType)}\n\n`; }
       if(dyn.devices) { extraDe += `📱 Geräte:\n${formatVal(dyn.devices)}\n\n`; extraEn += `📱 Devices:\n${translateVal(dyn.devices)}\n\n`; }
       if(dyn.householdCat) { extraDe += `🏠 Geräte-Typ:\n${formatVal(dyn.householdCat)}\n\n`; extraEn += `🏠 Appliance Type:\n${translateVal(dyn.householdCat)}\n\n`; }
-      if(dyn.timeLimit) { extraDe += `⏳ Gültig bis:\n${formatVal(dyn.timeLimit)}\n\n`; extraEn += `⏳ Valid until:\n${translateVal(dyn.timeLimit)}\n\n`; }
       if(dyn.freebieType) { extraDe += `🎁 Angebot-Typ:\n${formatVal(dyn.freebieType)}\n\n`; extraEn += `🎁 Offer Type:\n${translateVal(dyn.freebieType)}\n\n`; }
       if(dyn.requirement) { extraDe += `📋 Bedingung:\n${formatVal(dyn.requirement)}\n\n`; extraEn += `📋 Requirement:\n${translateVal(dyn.requirement)}\n\n`; }
       if(dyn.edition) { extraDe += `🌟 Edition:\n${formatVal(dyn.edition)}\n\n`; extraEn += `🌟 Edition:\n${translateVal(dyn.edition)}\n\n`; }
-      if(dyn.releaseDate) { extraDe += `📅 Release:\n${formatVal(dyn.releaseDate)}\n\n`; extraEn += `📅 Release:\n${formatVal(dyn.releaseDate)}\n\n`; }
       if(dyn.categoryName) { extraDe += `📁 Sparte:\n${formatVal(dyn.categoryName)}\n\n`; extraEn += `📁 Subcategory:\n${translateVal(dyn.categoryName)}\n\n`; }
 
-      // ERSTE ZEILE ALS CAPS LOCK HEADER JE NACH KATEGORIE
       const headerTitleDE = (cat && cat.headerDE ? cat.headerDE : '🔥 DEAL ALERT | ANGEBOT').toUpperCase();
       const headerTitleEN = (cat && cat.headerEN ? cat.headerEN : '🔥 DEAL ALERT | OFFER').toUpperCase();
 
-      // DEUTSCH
+      // --- DEUTSCH ---
       let post = `${headerTitleDE}\n\n🇩🇪 Deutsch\n\n`;
       post += `🛒 Produkt:\n${d.title}\n\n`;
       if(d.retailer) post += `🏪 Händler:\n${d.retailer}\n\n`;
       post += `🏷️ Kategorie:\n${cat.name}\n\n`;
+      
       if(extraDe) post += extraDe;
+      
       post += `💰 Preis:\n${priceStr}\n`;
       if(oldStr) post += `\n❌ Statt:\n${oldStr}\n`;
       if(disc) post += `\n📉 Ersparnis:\n${disc.percent} % Rabatt / ${disc.saved} € gespart\n`;
+      
       post += ratingStrDE;
+      
+      if(validityDE) post += `\n⏳ Gültig bis:\n${validityDE}\n`;
+      
       post += `\n🚚 Versand:\n${d.shipping}\n`;
+      
+      post += featuresDE;
+      
       post += `\n🔗 Zum Angebot:\n${d.link || '[Link hier einfügen]'}\n`;
       if(d.additionalInfo) post += `\n📌 Info:\n${d.additionalInfo}\n`;
 
       post += `\n━━━━━━━━━━━━━━\n\n`;
 
-      // ENGLISH
+      // --- ENGLISH ---
       post += `🇬🇧 English\n\n${headerTitleEN}\n\n`;
       post += `🛒 Product:\n${d.title}\n\n`;
       if(d.retailer) post += `🏪 Retailer:\n${d.retailer}\n\n`;
       post += `🏷️ Category:\n${translate(cat.name)}\n\n`;
+      
       if(extraEn) post += extraEn;
+      
       post += `💰 Price:\n${formatPrice(d.newPrice).replace(',', '.')}\n`;
       if(oldStr) post += `\n❌ Was:\n${formatPrice(d.oldPrice).replace(',', '.')}\n`;
       if(disc) post += `\n📉 Discount:\n${disc.percent}% OFF / Save ${disc.saved.replace(',', '.')} €\n`;
+      
       post += ratingStrEN;
+      
+      if(validityEN) post += `\n⏳ Valid until:\n${validityEN}\n`;
+      
       post += `\n🚚 Shipping:\n${translate(d.shipping)}\n`;
+      
+      post += featuresEN;
+      
       post += `\n🔗 Deal link:\n${d.link || '[Insert link here]'}\n`;
       if(d.additionalInfo) post += `\n📌 Info:\n${d.additionalInfo}\n`;
 
@@ -711,7 +837,7 @@ createApp({
       textarea.select();
       try {
         document.execCommand('copy');
-        toast.value.message = 'Erfolgreich kopiert!';
+        toast.value.message = 'Erfolgreich kopiert! Bereit für Telegram.';
         toast.value.show = true;
         setTimeout(() => toast.value.show = false, 3000);
       } catch (err) {
@@ -723,7 +849,9 @@ createApp({
     const resetApp = () => {
       form.title = ''; form.newPrice = null; form.oldPrice = null; 
       form.ratingStars = ''; form.ratingCount = ''; form.link = ''; 
-      form.retailer = ''; form.additionalInfo = ''; form.dynamic = {};
+      form.retailer = ''; form.additionalInfo = ''; 
+      form.validityType = 'none'; form.validityDate = ''; form.features = [];
+      form.dynamic = {};
       rawEditMode.value = false;
     };
 
@@ -731,10 +859,10 @@ createApp({
       categories, selectedCategory, selectCategory,
       form, generatedPost, discountInfo, canGenerate,
       rawEditMode, editablePost, syncEditMode,
-      copyToClipboard, resetApp, toast, optionsPool,
+      copyToClipboard, resetApp, toast, optionsPool, currentTime,
       
       // Smart Options System
-      getOptionsList, toggleOption, isOptionSelected, triggerCustomOption, showWarningModal, confirmCustomUnlock,
+      getOptionsList, toggleOption, toggleFeature, isOptionSelected, triggerCustomOption,
       isAddingCustom, customInput, saveCustomOption, cancelCustomOption
     };
   }
@@ -742,3 +870,4 @@ createApp({
 </script>
 </body>
 </html>
+```eof
