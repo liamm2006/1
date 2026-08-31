@@ -246,6 +246,68 @@ const {createApp,reactive,ref,computed,onMounted}=Vue;
  const storageOptions=['32 GB','64 GB','128 GB','256 GB','512 GB','1 TB','2 TB','4 TB'];
  const hwCategories=['CPU','GPU','RAM','SSD','Mainboard','Monitor','Netzteil','Gehäuse','Notebook','Kühler','Lüfter','Tastatur','Maus','Headset','Zubehör'];
  const featureOptions=['Historischer Tiefpreis','Bestpreis','Nur für Prime-Mitglieder','Gutschein auf der Artikelseite aktivieren','Cashback möglich','Versandkostenfrei','Vorbestellung','Limitierte Stückzahl','Nur online verfügbar','Auch im Store erhältlich','App-exklusiv'];
+ const translationDict={
+  'Normaler Deal':'Standard Deal','Deal of the Day':'Deal of the Day','Flash Deal':'Flash Deal','Freebie / Gratis':'Freebie / Free',
+  'Neuerscheinung':'New Release','Gaming Deal':'Gaming Deal','Smartphone Deal':'Smartphone Deal','Hardware Deal':'Hardware Deal',
+  'Software Deal':'Software Deal','Haushalt Deal':'Household Deal','Bücher & Media':'Books & Media','Beauty & Pflege':'Beauty & Care',
+  'Baby & Kind':'Baby & Kids','Möbel & Wohnen':'Furniture & Home','Reisen & Gutscheine':'Travel & Vouchers','Sonstige Produkte':'Other Products',
+  'Kostenlos':'Free','Kostenlos mit Prime':'Free with Prime','Express Versand':'Express Shipping','Abholung':'Pick-up only',
+  'Solange der Vorrat reicht':'While stocks last','Nur heute':'Today only','Nur heute bis 23:59 Uhr':'Today only until 11:59 PM',
+  'Historischer Tiefpreis':'All-time low price','Bestpreis':'Best price available','Nur für Prime-Mitglieder':'Prime members only',
+  'Gutschein auf der Artikelseite aktivieren':'Activate coupon on product page','Cashback möglich':'Cashback available',
+  'Versandkostenfrei':'Free shipping','Vorbestellung':'Pre-order','Limitierte Stückzahl':'Limited quantity available',
+  'Nur online verfügbar':'Online only','Auch im Store erhältlich':'Also available in-store','App-exklusiv':'App exclusive',
+  'Spiel':'Game','DLC':'DLC','Zubehör':'Accessories','Konsole':'Console','Controller':'Controller',
+  'Action':'Action','RPG':'RPG','Shooter':'Shooter','Sport':'Sports','Strategie':'Strategy','Simulator':'Simulation',
+  'Adventure':'Adventure','Rennspiel':'Racing','Horror':'Horror','Puzzle':'Puzzle','MMO':'MMO',
+  'PC':'PC','PS5':'PS5','Xbox Series X/S':'Xbox Series X/S','PS4':'PS4','Xbox One':'Xbox One','Nintendo Switch':'Nintendo Switch',
+  'Mobile (iOS/Android)':'Mobile (iOS/Android)','VR':'VR',
+  'Neu':'New','Wie neu':'Like new','Sehr gut':'Very good','Gut':'Good','Gebraucht':'Used',
+  'Generalüberholt (Refurbished)':'Refurbished','B-Ware':'B-Stock','Akzeptabel':'Acceptable',
+  'Keine':'None','Keine Garantie':'No warranty','1 Monat':'1 month','3 Monate':'3 months','6 Monate':'6 months',
+  '12 Monate':'12 months','24 Monate':'24 months','36 Monate':'36 months','Lebenslang':'Lifetime',
+  'Standard Edition':'Standard Edition','Deluxe Edition':'Deluxe Edition',"Collector's Edition":"Collector's Edition",
+  'GOTY Edition':'GOTY Edition','Ultimate Edition':'Ultimate Edition','Anniversary Edition':'Anniversary Edition',
+  'CPU':'CPU','GPU':'GPU','RAM':'RAM','SSD':'SSD','Mainboard':'Motherboard','Monitor':'Monitor','Netzteil':'Power Supply',
+  'Gehäuse':'PC Case','Notebook':'Laptop','Kühler':'Cooler','Lüfter':'Fan','Tastatur':'Keyboard','Maus':'Mouse','Headset':'Headset',
+  'Apple':'Apple','Samsung':'Samsung','Xiaomi':'Xiaomi','Google':'Google','Sony':'Sony','Asus':'Asus','Lenovo':'Lenovo','LG':'LG',
+  'Philips':'Philips','Bosch':'Bosch','Dyson':'Dyson','Nintendo':'Nintendo','Microsoft':'Microsoft','Dell':'Dell','HP':'HP',
+  'Acer':'Acer','JBL':'JBL','Bose':'Bose','Anker':'Anker','Logitech':'Logitech',
+  'Gehäuse':'PC Case','32 GB':'32 GB','64 GB':'64 GB','128 GB':'128 GB','256 GB':'256 GB','512 GB':'512 GB','1 TB':'1 TB','2 TB':'2 TB','4 TB':'4 TB',
+  'Dual-SIM':'Dual SIM','eSIM':'eSIM','Single-SIM + eSIM':'Single SIM + eSIM','Nano-SIM':'Nano SIM',
+  'Antivirus & Sicherheit':'Antivirus & Security','Office & Produktivität':'Office & Productivity','VPN':'VPN',
+  'Grafik & Video':'Graphics & Video','Betriebssystem':'Operating System','Cloud-Speicher':'Cloud Storage',
+  'Kreativ-Suite':'Creative Suite','Entwicklertools':'Developer Tools',
+  'Lebenslange Lizenz (Lifetime)':'Lifetime License','Monats-Abo':'Monthly Subscription',
+  'Einmalkauf (Lizenzschlüssel)':'One-time purchase','1-Jahres-Lizenz':'1-Year License',
+  'Unbegrenzt (PC & Mac)':'Unlimited (PC & Mac)','1 Gerät':'1 Device','3 Geräte':'3 Devices','5 Geräte':'5 Devices','10 Geräte':'10 Devices',
+  'Saugroboter':'Robot Vacuum','Kaffeemaschine':'Coffee Machine','Airfryer / Heißluftfritteuse':'Air Fryer',
+  'Küchenmaschine':'Food Processor','Smart Home & Licht':'Smart Home & Lighting','Werkzeug':'Tools','Waschmaschine':'Washing Machine',
+  'Luftreiniger':'Air Purifier','Ventilator':'Fan','Heizlüfter':'Space Heater',
+  'Gratis-Produkt':'Free Product','Kostenloses Spiel':'Free Game','Test-Abo':'Free Trial','Gutschein / Coupon':'Voucher / Coupon',
+  'Demo-Version':'Demo Version','Keine Registrierung nötig':'No registration required','Kostenloser Account erforderlich':'Free account required',
+  'Nur für Neukunden':'New customers only','Mit Code-Eingabe':'Code entry required',
+  'Mode & Accessoires':'Fashion & Accessories','Sport & Outdoor':'Sports & Outdoor','Garten & Heimwerken':'Garden & DIY',
+  'Auto & Motorrad':'Car & Motorcycle','Spielzeug & Hobby':'Toys & Hobbies','Gutscheine':'Vouchers',
+  'Buch':'Book','Hörbuch':'Audiobook','E-Book':'E-Book','Film / Blu-ray':'Movie / Blu-ray','Vinyl / CD':'Vinyl / CD',
+  'Roman':'Novel','Sachbuch':'Non-fiction','Fantasy':'Fantasy','Krimi':'Crime','Biografie':'Biography','Kinderbuch':"Children's Book",
+  'Comic / Manga':'Comic / Manga','Hardcover':'Hardcover','Taschenbuch':'Paperback','Digital':'Digital',
+  'Hautpflege':'Skincare','Makeup':'Makeup','Parfum':'Perfume','Haarpflege':'Hair Care','Rasur & Bartpflege':'Shaving & Beard Care',
+  'Wellness & Massage':'Wellness & Massage','Spielzeug':'Toys','Kleidung':'Clothing','Kinderwagen':'Stroller','Pflege':'Care',
+  'Möbel':'Furniture','Sicherheit':'Safety','Stillzubehör':'Nursing Accessories','0-6 Monate':'0-6 months','6-12 Monate':'6-12 months',
+  '1-3 Jahre':'1-3 years','3-6 Jahre':'3-6 years','6+ Jahre':'6+ years',
+  'Sofa':'Sofa','Bett':'Bed','Tisch':'Table','Stuhl':'Chair','Regal':'Shelf','Beleuchtung':'Lighting','Deko':'Decor',
+  'Teppich':'Rug','Holz':'Wood','Metall':'Metal','Stoff':'Fabric','Leder':'Leather','Glas':'Glass','Kunststoff':'Plastic',
+  'Pauschalreise':'Package Holiday','Hotel':'Hotel','Flug':'Flight','Mietwagen':'Rental Car','Gutschein':'Voucher','Erlebnis':'Experience'
+ };
+ const translateValue=value=>{
+   if(value==null || value==='') return '';
+   if(Array.isArray(value)) return value.map(translateValue).join(', ');
+   if(translationDict[value]) return translationDict[value];
+   if(typeof value==='string' && value.includes(' • ')) return value.split(' • ').map(x=>translationDict[x]||x).join(' • ');
+   return value;
+ };
+
 createApp({setup(){
  const postMode=ref('collection'), lang=ref('both'), compact=ref(false), toast=ref(''), time=ref('');
  const modes=[
@@ -265,28 +327,28 @@ createApp({setup(){
  const resolvedCategory=source=>source.category==='__custom__'?(source.categoryCustom||'Eigene Kategorie'):source.category;
  const singleLines=(english=false)=>{
   const t=single.title||'Produkt'; const lines=[]; lines.push('🛒 '+(english?'Product':'Produkt')+':\n'+t);
-  if(resolvedValue(single,'retailer'))lines.push('🏪 '+(english?'Retailer':'Händler')+':\n'+resolvedValue(single,'retailer'));
-  if(resolvedCategory(single))lines.push('🏷️ '+(english?'Category':'Kategorie')+':\n'+resolvedCategory(single));
-  if(resolvedValue(single,'platform'))lines.push('🎮 '+(english?'Platform':'Plattform')+':\n'+resolvedValue(single,'platform'));
-  if(resolvedValue(single,'brand'))lines.push('🏭 '+(english?'Brand':'Hersteller')+':\n'+resolvedValue(single,'brand'));
-  if(resolvedValue(single,'storage'))lines.push('💾 '+(english?'Storage':'Speicher')+':\n'+resolvedValue(single,'storage'));
-  if(resolvedValue(single,'hwCat'))lines.push('⚙️ '+(english?'Component':'Komponente')+':\n'+resolvedValue(single,'hwCat'));
-  if(resolvedValue(single,'productType'))lines.push('🕹️ '+(english?'Type':'Produktart')+':\n'+resolvedValue(single,'productType'));
-  if(resolvedValue(single,'genre'))lines.push('🎭 '+(english?'Genre':'Genre')+':\n'+resolvedValue(single,'genre'));
-  lines.push('💰 '+(english?'Price':'Preis')+':\n'+(single.price!=null?Number(single.price).toFixed(2)+' €':'Preis offen'));
+  if(resolvedValue(single,'retailer'))lines.push('🏪 '+(english?'Retailer':'Händler')+':\n'+(english?translateValue(resolvedValue(single,'retailer')):resolvedValue(single,'retailer')));
+  if(resolvedCategory(single))lines.push('🏷️ '+(english?'Category':'Kategorie')+':\n'+(english?translateValue(resolvedCategory(single)):resolvedCategory(single)));
+  if(resolvedValue(single,'platform'))lines.push('🎮 '+(english?'Platform':'Plattform')+':\n'+(english?translateValue(resolvedValue(single,'platform')):resolvedValue(single,'platform')));
+  if(resolvedValue(single,'brand'))lines.push('🏭 '+(english?'Brand':'Hersteller')+':\n'+(english?translateValue(resolvedValue(single,'brand')):resolvedValue(single,'brand')));
+  if(resolvedValue(single,'storage'))lines.push('💾 '+(english?'Storage':'Speicher')+':\n'+(english?translateValue(resolvedValue(single,'storage')):resolvedValue(single,'storage')));
+  if(resolvedValue(single,'hwCat'))lines.push('⚙️ '+(english?'Component':'Komponente')+':\n'+(english?translateValue(resolvedValue(single,'hwCat')):resolvedValue(single,'hwCat')));
+  if(resolvedValue(single,'productType'))lines.push('🕹️ '+(english?'Type':'Produktart')+':\n'+(english?translateValue(resolvedValue(single,'productType')):resolvedValue(single,'productType')));
+  if(resolvedValue(single,'genre'))lines.push('🎭 '+(english?'Genre':'Genre')+':\n'+(english?translateValue(resolvedValue(single,'genre')):resolvedValue(single,'genre')));
+  lines.push('💰 '+(english?'Price':'Preis')+':\n'+(single.price!=null?Number(single.price).toFixed(2)+' €':english?'Price open':'Preis offen'));
   if(single.oldPrice)lines.push('❌ '+(english?'Was':'Statt')+':\n'+Number(single.oldPrice).toFixed(2)+' €');
   if(singlePct.value)lines.push('📉 '+(english?'Discount':'Rabatt')+':\n'+singlePct.value+'% '+(english?'OFF':'Rabatt'));
   if(single.ratingStars)lines.push('⭐ '+(english?'Rating':'Bewertung')+':\n'+single.ratingStars+' ⭐'+(single.ratingCount?' | '+single.ratingCount+' '+(english?'reviews':'Bewertungen'):'') );
-  if(resolvedValue(single,'validity'))lines.push('⏳ '+(english?'Valid until':'Gültig bis')+':\n'+resolvedValue(single,'validity'));
-  if(resolvedValue(single,'shipping'))lines.push('🚚 '+(english?'Shipping':'Versand')+':\n'+resolvedValue(single,'shipping'));
-  if(single.features.length)lines.push('✨ '+(english?'Highlights':'Highlights')+':\n'+single.features.map(f=>'• '+f).join('\n'));
+  if(resolvedValue(single,'validity'))lines.push('⏳ '+(english?'Valid until':'Gültig bis')+':\n'+(english?translateValue(resolvedValue(single,'validity')):resolvedValue(single,'validity')));
+  if(resolvedValue(single,'shipping'))lines.push('🚚 '+(english?'Shipping':'Versand')+':\n'+(english?translateValue(resolvedValue(single,'shipping')):resolvedValue(single,'shipping')));
+  if(single.features.length)lines.push('✨ '+(english?'Highlights':'Highlights')+':\n'+single.features.map(f=>'• '+(english?translateValue(f):f)).join('\n'));
   if(single.link)lines.push('🔗 '+(english?'Deal link':'Zum Angebot')+':\n'+single.link);
   if(single.additionalInfo)lines.push('📌 '+(english?'Info':'Info')+':\n'+single.additionalInfo);
   return lines.join('\n\n');
  };
  const productLines=(p,i,english=false)=>{
-  const name=p.title||'Unnamed product'; const price=p.price!=null?Number(p.price).toFixed(2).replace('.',english?'.':',')+' €':'Preis offen'; const old=p.oldPrice?Number(p.oldPrice).toFixed(2).replace('.',english?'.':',')+' €':''; const discount=pct(p);
-  const lines=[]; lines.push(`${i?i+'️⃣ ':''}${name}`); if(resolvedCategory(p))lines.push(`${english?'Category':'Kategorie'}: ${resolvedCategory(p)}`); if(resolvedValue(p,'platform'))lines.push(`${english?'Platform':'Plattform'}: ${resolvedValue(p,'platform')}`); if(resolvedValue(p,'retailer'))lines.push(`${english?'Retailer':'Händler'}: ${resolvedValue(p,'retailer')}`); lines.push(`💰 ${english?'Price':'Preis'}: ${price}`); if(old)lines.push(`❌ ${english?'Was':'Statt'}: ${old}`); if(discount)lines.push(`📉 ${english?'Save':'Rabatt'}: ${discount}%`); if(p.extra)lines.push(`✨ ${english?'Details':'Details'}: ${p.extra}`); if(p.link)lines.push(`🔗 ${english?'Deal':'Angebot'}: ${p.link}`); return lines.join('\n');
+  const name=p.title||'Unnamed product'; const price=p.price!=null?Number(p.price).toFixed(2).replace('.',english?'.':',')+' €':english?'Price open':'Preis offen'; const old=p.oldPrice?Number(p.oldPrice).toFixed(2).replace('.',english?'.':',')+' €':''; const discount=pct(p);
+  const lines=[]; lines.push(`${i?i+'️⃣ ':''}${name}`); if(resolvedCategory(p))lines.push(`${english?'Category':'Kategorie'}: ${english?translateValue(resolvedCategory(p)):resolvedCategory(p)}`); if(resolvedValue(p,'platform'))lines.push(`${english?'Platform':'Plattform'}: ${english?translateValue(resolvedValue(p,'platform')):resolvedValue(p,'platform')}`); if(resolvedValue(p,'retailer'))lines.push(`${english?'Retailer':'Händler'}: ${english?translateValue(resolvedValue(p,'retailer')):resolvedValue(p,'retailer')}`); lines.push(`💰 ${english?'Price':'Preis'}: ${price}`); if(old)lines.push(`❌ ${english?'Was':'Statt'}: ${old}`); if(discount)lines.push(`📉 ${english?'Save':'Rabatt'}: ${discount}%`); if(p.extra)lines.push(`✨ ${english?'Details':'Details'}: ${p.extra}`); if(p.link)lines.push(`🔗 ${english?'Deal':'Angebot'}: ${p.link}`); return lines.join('\n');
  };
  const toggleSingleFeature=feat=>{const i=single.features.indexOf(feat);if(i>-1)single.features.splice(i,1);else single.features.push(feat)};
  const singlePct=computed(()=>single.oldPrice&&single.price&&single.oldPrice>single.price?Math.round((single.oldPrice-single.price)/single.oldPrice*100):0);
