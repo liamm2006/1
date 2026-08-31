@@ -1,981 +1,320 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CyberDealz Generator - Pro Edition</title>
-
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Vue 3 Stable CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.21/vue.global.prod.js"></script>
-  <!-- FontAwesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            display: ['Space Grotesk', 'sans-serif'],
-            sans: ['Inter', 'sans-serif'],
-            mono: ['IBM Plex Mono', 'monospace'],
-          },
-          colors: {
-            ink: { 900:'#18181B', 700:'#3F3F46', 500:'#71717A', 400:'#A1A1AA', 300:'#D4D4D8', 200:'#E4E4E7', 100:'#F4F4F5', 50:'#FAFAFA' },
-            accent: { DEFAULT:'#15803D', hover:'#166534', soft:'#F0FDF4', ring:'#86EFAC', dark: '#14532D' },
-            neg: { DEFAULT:'#DC2626', soft:'#FEF2F2' },
-            tg: { bg:'#EAEEF2', bubble:'#FFFFFF' }
-          }
-        }
-      }
-    };
-  </script>
-
-  <style>
-    body { background-color: #FAFAFA; color: #18181B; font-family: 'Inter', sans-serif; }
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #D4D4D8; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #A1A1AA; }
-    .card { background: #FFFFFF; border: 1px solid #E4E4E7; }
-    .fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease, transform 0.2s ease; }
-    .fade-enter-from, .fade-leave-to { opacity: 0; transform: translateY(-2px); }
-    .chip { transition: all 0.15s ease; }
-    .chip:active { transform: scale(0.97); }
-    :focus-visible { outline: 2px solid #15803D; outline-offset: 2px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyberDealz Generator</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.21/vue.global.prod.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+tailwind.config={theme:{extend:{fontFamily:{display:['Space Grotesk','sans-serif'],sans:['Inter','sans-serif'],mono:['IBM Plex Mono','monospace']},colors:{ink:{950:'#0f1115',900:'#18181B',700:'#3F3F46',500:'#71717A',400:'#A1A1AA',300:'#D4D4D8',200:'#E4E4E7',100:'#F4F4F5',50:'#FAFAFA'},accent:{DEFAULT:'#15803D',hover:'#166534',soft:'#F0FDF4',ring:'#86EFAC'},tg:{bg:'#EAEEF2',bubble:'#FFFFFF'}}}}}
+</script>
+<style>
+body{background:#f6f7f8;color:#18181b;font-family:Inter,sans-serif}.card{background:#fff;border:1px solid #e4e4e7;box-shadow:0 1px 2px rgba(0,0,0,.03)}.chip{transition:.15s}.chip:active{transform:scale(.98)}.scrollbar::-webkit-scrollbar{width:7px}.scrollbar::-webkit-scrollbar-thumb{background:#d4d4d8;border-radius:8px}.gridbg{background-image:linear-gradient(#eceef0 1px,transparent 1px),linear-gradient(90deg,#eceef0 1px,transparent 1px);background-size:24px 24px}.pulseDot{animation:pulse 1.8s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+</style>
 </head>
-<body class="min-h-screen flex flex-col antialiased selection:bg-accent-ring/40 selection:text-ink-900">
+<body>
+<div id="app" class="min-h-screen">
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-zinc-200">
+ <div class="max-w-[1500px] mx-auto px-4 h-16 flex items-center justify-between">
+  <div class="flex items-center gap-3">
+   <div class="w-9 h-9 rounded-xl bg-zinc-950 text-white grid place-items-center font-bold">CD</div>
+   <div><div class="font-display font-semibold leading-tight">CyberDealz</div><div class="font-mono text-[10px] uppercase tracking-widest text-zinc-400">Post Composer</div></div>
+  </div>
+  <div class="flex items-center gap-2">
+   <button @click="resetAll" class="px-3 py-2 rounded-lg border border-zinc-200 text-xs hover:bg-zinc-50"><i class="fa-solid fa-rotate-left mr-1.5"></i>Reset</button>
+   <button @click="copyPost" class="px-3 py-2 rounded-lg bg-zinc-950 text-white text-xs hover:bg-zinc-800"><i class="fa-regular fa-copy mr-1.5"></i>Kopieren</button>
+   <button @click="openTelegram" class="px-3.5 py-2 rounded-lg bg-[#229ED9] text-white text-xs font-semibold hover:brightness-95"><i class="fa-brands fa-telegram mr-1.5"></i>Export to Telegram</button>
+  </div>
+ </div>
+</header>
 
-<!-- STREAMING_CHUNK:Initializing Application Container -->
-<div id="app" class="flex flex-col min-h-screen">
+<main class="max-w-[1500px] mx-auto p-4 lg:p-6">
+ <div class="grid grid-cols-1 xl:grid-cols-[280px_minmax(0,1fr)_420px] gap-4 lg:gap-6">
 
-  <!-- HEADER -->
-  <header class="bg-white/90 backdrop-blur sticky top-0 z-40 border-b border-ink-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="w-9 h-9 rounded-lg bg-ink-900 flex items-center justify-center text-white font-display font-bold text-sm">
-          CD
-        </div>
-        <div>
-          <h1 class="font-display text-lg font-semibold tracking-tight text-ink-900 leading-tight">CyberDealz <span class="text-ink-400 font-medium">Generator</span></h1>
-          <div class="text-[11px] font-mono text-ink-500 tracking-wide">v7.0 — Post Composer</div>
-        </div>
+  <aside class="space-y-4">
+   <div class="card rounded-2xl p-4">
+    <div class="flex items-center justify-between mb-3"><h2 class="font-display font-semibold text-sm">Post-Modus</h2><span class="text-[10px] font-mono text-zinc-400">LAB</span></div>
+    <div class="space-y-2">
+     <button v-for="mode in modes" :key="mode.id" @click="postMode=mode.id" :class="['w-full text-left rounded-xl border p-3',postMode===mode.id?'bg-zinc-950 text-white border-zinc-950':'border-zinc-200 hover:border-zinc-400']"><div class="flex items-center gap-3"><span class="text-lg">{{mode.icon}}</span><div><div class="text-xs font-semibold">{{mode.name}}</div><div :class="['text-[10px] mt-0.5',postMode===mode.id?'text-zinc-300':'text-zinc-500']">{{mode.desc}}</div></div></div></button>
+    </div>
+   </div>
+   <div class="card rounded-2xl p-4">
+    <h2 class="font-display font-semibold text-sm mb-3">Schnellaktionen</h2>
+    <div class="grid grid-cols-2 gap-2">
+     <button @click="addProduct" class="chip rounded-xl border border-zinc-200 px-3 py-3 text-left hover:border-zinc-400"><i class="fa-solid fa-plus text-zinc-500"></i><div class="text-[11px] font-semibold mt-2">Angebot</div></button>
+     <button @click="duplicateLast" class="chip rounded-xl border border-zinc-200 px-3 py-3 text-left hover:border-zinc-400"><i class="fa-regular fa-copy text-zinc-500"></i><div class="text-[11px] font-semibold mt-2">Duplizieren</div></button>
+     <button @click="sortProducts('discount')" class="chip rounded-xl border border-zinc-200 px-3 py-3 text-left hover:border-zinc-400"><i class="fa-solid fa-arrow-down-wide-short text-zinc-500"></i><div class="text-[11px] font-semibold mt-2">Rabatt sortieren</div></button>
+     <button @click="sortProducts('price')" class="chip rounded-xl border border-zinc-200 px-3 py-3 text-left hover:border-zinc-400"><i class="fa-solid fa-euro-sign text-zinc-500"></i><div class="text-[11px] font-semibold mt-2">Preis sortieren</div></button>
+    </div>
+   </div>
+/div>
+  </aside>
+
+  <section class="space-y-4 min-w-0">
+   <div class="card rounded-2xl overflow-hidden">
+    <div class="px-5 py-4 border-b border-zinc-200 flex flex-wrap gap-3 items-center justify-between">
+     <div><div class="font-display font-semibold">Composer</div><div class="text-[10px] text-zinc-400 mt-0.5">Einmal Daten eingeben, überall posten.</div></div>
+     <div class="flex items-center gap-2 text-[10px] text-zinc-500"><span class="px-2 py-1 rounded-full bg-zinc-100">{{products.length}} Angebote</span><button @click="compact=!compact" class="px-2 py-1 rounded-full border border-zinc-200 hover:bg-zinc-50">{{compact?'Detail':'Kompakt'}} Ansicht</button></div>
+    </div>
+
+    <div class="p-4 md:p-5 space-y-5" v-if="postMode==='single'">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+       <div>
+        <label class="label">Produktname <span class="text-red-500">*</span></label>
+        <input v-model="single.title" class="field" placeholder="z.B. Sony PlayStation 5 Slim / Elden Ring">
+       </div>
+       <div>
+        <label class="label">Kategorie <span class="text-red-500">*</span></label>
+        <select v-model="single.category" class="field">
+         <option value="">Kategorie auswählen...</option>
+         <option v-for="cat in categories" :key="cat.id" :value="cat.name">{{cat.icon}} {{cat.name}}</option>
+         <option value="__custom__">✏️ Eigene Kategorie...</option>
+        </select>
+        <input v-if="single.category==='__custom__'" v-model="single.categoryCustom" @input="single.category=single.categoryCustom ? '__custom__' : '__custom__'" class="field mt-2" placeholder="Eigene Kategorie eingeben...">
+       </div>
       </div>
-      <div class="flex space-x-3">
-        <button @click="resetApp" class="px-3.5 py-2 rounded-lg bg-white hover:bg-ink-50 border border-ink-200 text-xs font-medium transition text-ink-700 flex items-center">
-          <i class="fa-solid fa-rotate-left mr-2 text-ink-400"></i> Zurücksetzen
-        </button>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-zinc-50 p-4 rounded-2xl border border-zinc-200">
+       <div><label class="label">Neuer Preis (€) <span class="text-red-500">*</span></label><input v-model.number="single.price" type="number" step="0.01" class="field" placeholder="0,00"></div>
+       <div><label class="label">Alter Preis / UVP (€)</label><input v-model.number="single.oldPrice" type="number" step="0.01" class="field" placeholder="0,00"></div>
+       <div><label class="label">Bewertung (Sterne)</label><input v-model="single.ratingStars" type="number" step="0.1" min="0" max="5" class="field" placeholder="z.B. 4,7"></div>
+       <div><label class="label">Anzahl Bewertungen</label><input v-model="single.ratingCount" type="number" class="field" placeholder="z.B. 1850"></div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+       <div>
+        <label class="label">Händler</label>
+        <select v-model="single.retailer" class="field">
+         <option value="">Händler auswählen...</option>
+         <option v-for="ret in retailerOptions" :key="ret" :value="ret">{{ret}}</option>
+         <option value="__custom__">✏️ Eigener Händler...</option>
+        </select>
+        <input v-if="single.retailer==='__custom__'" v-model="single.retailerCustom" class="field mt-2" placeholder="Eigenen Händler eingeben...">
+       </div>
+       <div>
+        <label class="label">Plattform</label>
+        <select v-model="single.platform" class="field">
+         <option value="">Plattform auswählen...</option>
+         <option v-for="platform in platformOptions" :key="platform" :value="platform">{{platform}}</option>
+         <option value="__custom__">✏️ Eigene Plattform...</option>
+        </select>
+        <input v-if="single.platform==='__custom__'" v-model="single.platformCustom" class="field mt-2" placeholder="Eigene Plattform eingeben...">
+       </div>
+       <div>
+        <label class="label">Versand</label>
+        <select v-model="single.shipping" class="field">
+         <option value="">Versand auswählen...</option>
+         <option v-for="ship in shippingOptions" :key="ship" :value="ship">{{ship}}</option>
+         <option value="__custom__">✏️ Eigener Wert...</option>
+        </select>
+        <input v-if="single.shipping==='__custom__'" v-model="single.shippingCustom" class="field mt-2" placeholder="Eigene Versandangabe...">
+       </div>
+       <div>
+        <label class="label">Gültigkeit</label>
+        <select v-model="single.validity" class="field">
+         <option value="">Keine Angabe</option><option value="Solange der Vorrat reicht">Solange der Vorrat reicht</option><option value="Nur heute bis 23:59 Uhr">Nur heute</option>
+         <option value="__custom__">✏️ Eigener Wert...</option>
+        </select>
+        <input v-if="single.validity==='__custom__'" v-model="single.validityCustom" class="field mt-2" placeholder="Eigene Gültigkeitsangabe...">
+       </div>
+      </div>
+
+      <div v-if="single.category==='Gaming Deal'" class="rounded-2xl border border-zinc-200 bg-white p-4">
+       <div class="text-[11px] font-semibold uppercase tracking-wide text-zinc-500 mb-3">Gaming Details</div>
+       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div><label class="label">Produktart</label><select v-model="single.productType" class="field"><option value="">Auswählen...</option><option v-for="x in gameTypes" :key="x" :value="x">{{x}}</option><option value="__custom__">✏️ Eigener Wert...</option></select><input v-if="single.productType==='__custom__'" v-model="single.productTypeCustom" class="field mt-2" placeholder="Eigene Produktart..."></div>
+        <div><label class="label">Genre</label><select v-model="single.genre" class="field"><option value="">Auswählen...</option><option v-for="x in genres" :key="x" :value="x">{{x}}</option><option value="__custom__">✏️ Eigener Wert...</option></select><input v-if="single.genre==='__custom__'" v-model="single.genreCustom" class="field mt-2" placeholder="Eigenes Genre..."></div>
+       </div>
+      </div>
+      <div v-else-if="single.category==='Smartphone Deal'" class="rounded-2xl border border-zinc-200 bg-white p-4">
+       <div class="text-[11px] font-semibold uppercase tracking-wide text-zinc-500 mb-3">Smartphone Details</div>
+       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div><label class="label">Hersteller</label><select v-model="single.brand" class="field"><option value="">Auswählen...</option><option v-for="x in brands" :key="x" :value="x">{{x}}</option><option value="__custom__">✏️ Eigener Wert...</option></select><input v-if="single.brand==='__custom__'" v-model="single.brandCustom" class="field mt-2" placeholder="Eigene Marke / Hersteller..."></div>
+        <div><label class="label">Speicher</label><select v-model="single.storage" class="field"><option value="">Auswählen...</option><option v-for="x in storageOptions" :key="x" :value="x">{{x}}</option><option value="__custom__">✏️ Eigener Wert...</option></select><input v-if="single.storage==='__custom__'" v-model="single.storageCustom" class="field mt-2" placeholder="Eigene Speicherangabe..."></div>
+       </div>
+      </div>
+      <div v-else-if="single.category==='Hardware Deal'" class="rounded-2xl border border-zinc-200 bg-white p-4">
+       <div class="text-[11px] font-semibold uppercase tracking-wide text-zinc-500 mb-3">Hardware Details</div>
+       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div><label class="label">Komponente</label><select v-model="single.hwCat" class="field"><option value="">Auswählen...</option><option v-for="x in hwCategories" :key="x" :value="x">{{x}}</option><option value="__custom__">✏️ Eigener Wert...</option></select><input v-if="single.hwCat==='__custom__'" v-model="single.hwCatCustom" class="field mt-2" placeholder="Eigene Komponente..."></div>
+        <div><label class="label">Hersteller</label><select v-model="single.brand" class="field"><option value="">Auswählen...</option><option v-for="x in brands" :key="x" :value="x">{{x}}</option><option value="__custom__">✏️ Eigener Wert...</option></select><input v-if="single.brand==='__custom__'" v-model="single.brandCustom" class="field mt-2" placeholder="Eigene Marke / Hersteller..."></div>
+       </div>
+      </div>
+
+      <div>
+       <div class="label mb-2">Highlights / Features</div>
+       <div class="flex flex-wrap gap-2">
+        <button v-for="feat in featureOptions" :key="feat" @click="toggleSingleFeature(feat)" :class="['chip px-3 py-1.5 rounded-lg text-xs font-medium border',single.features.includes(feat)?'bg-emerald-50 text-emerald-800 border-emerald-200':'bg-white text-zinc-500 border-zinc-200 hover:border-zinc-400']">{{feat}}</button>
+       </div>
+      </div>
+
+      <div>
+       <label class="label">Deal Link <span class="text-red-500">*</span></label>
+       <input v-model="single.link" type="url" class="field" placeholder="https://...">
+      </div>
+      <div>
+       <label class="label">Manuelle Zusatzinfo</label>
+       <textarea v-model="single.additionalInfo" rows="3" class="field resize-none" placeholder="Nur für spezielle Hinweise..."></textarea>
       </div>
     </div>
-  </header>
 
-  <!-- MAIN CONTENT -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div class="p-4 md:p-5 space-y-3" v-else-if="postMode==='announcement'">
+      <div class="grid grid-cols-1 gap-3"><input v-model="announcement.titleDE" class="field" placeholder="Deutsche Überschrift"><input v-model="announcement.titleEN" class="field" placeholder="English headline"><textarea v-model="announcement.textDE" rows="6" class="field" placeholder="Deutscher Text..."></textarea><textarea v-model="announcement.textEN" rows="6" class="field" placeholder="English text..."></textarea></div>
+    </div>
 
-      <!-- LEFT COLUMN: Formular -->
-      <div class="lg:col-span-7 space-y-5">
-
-        <!-- STREAMING_CHUNK:Rendering Category Selection -->
-        <div class="card rounded-2xl p-5">
-          <div class="flex justify-between items-center mb-3">
-            <h2 class="font-display text-sm font-semibold text-ink-900 uppercase tracking-wide flex items-center">
-              <i class="fa-solid fa-layer-group text-ink-400 mr-2"></i> Deal Kategorie
-            </h2>
-            <span class="text-[11px] text-ink-500 font-mono bg-ink-100 px-2 py-1 rounded-md">{{ categories.length }} Kategorien</span>
-          </div>
-
-          <!-- Skalierbare Suche für wachsende Kategorienliste -->
-          <div class="relative mb-3">
-            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 text-xs"></i>
-            <input type="text" v-model="categorySearch" placeholder="Kategorie suchen..." class="w-full bg-ink-50 border border-ink-200 rounded-xl pl-9 pr-3 py-2 text-sm text-ink-900 placeholder:text-ink-400 focus:border-ink-900 focus:bg-white outline-none transition">
-          </div>
-
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            <button v-for="cat in filteredCategories" :key="cat.id" @click="selectCategory(cat)"
-              :class="['chip px-3 py-2.5 rounded-xl border text-sm font-medium flex items-center space-x-2 text-left',
-                       selectedCategory.id === cat.id ? 'bg-ink-900 border-ink-900 text-white' : 'bg-white border-ink-200 text-ink-600 hover:border-ink-400 hover:text-ink-900']">
-              <span class="text-base leading-none">{{ cat.icon }}</span>
-              <span class="truncate">{{ cat.name }}</span>
-            </button>
-          </div>
-          <p v-if="filteredCategories.length === 0" class="text-xs text-ink-400 text-center py-4">Keine Kategorie gefunden für "{{ categorySearch }}"</p>
-        </div>
-
-        <!-- STREAMING_CHUNK:Rendering Base Data Form -->
-        <div class="card rounded-2xl p-6">
-          <h2 class="font-display text-sm font-semibold text-ink-900 uppercase tracking-wide mb-5 flex items-center">
-            <i class="fa-solid fa-box-open text-ink-400 mr-2"></i> Basis Daten
-          </h2>
-
-          <div class="space-y-5">
-            <!-- Titel -->
-            <div>
-              <label class="block text-xs font-medium text-ink-500 mb-1.5">Produktname <span class="text-neg">*</span></label>
-              <input type="text" v-model="form.title" placeholder="z.B. Sony PlayStation 5 Slim / Samsung Galaxy S24 Ultra" class="w-full bg-white border border-ink-200 rounded-xl px-4 py-3 text-sm text-ink-900 focus:border-ink-900 outline-none transition">
-            </div>
-
-            <!-- Preise -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-ink-50 p-4 rounded-xl border border-ink-200">
-              <div>
-                <div class="flex items-center justify-between mb-1.5">
-                  <label class="block text-xs font-medium text-ink-500">Neuer Preis (€) <span class="text-neg">*</span></label>
-                  <span v-if="discountInfo" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-accent-soft text-accent-dark border border-accent-ring">
-                    -{{ discountInfo.percent }}%
-                  </span>
-                </div>
-                <input type="number" step="0.01" v-model.number="form.newPrice" placeholder="0.00" class="w-full bg-white border border-ink-200 rounded-xl px-4 py-2.5 text-base font-mono text-accent-dark font-semibold focus:border-accent outline-none transition">
-              </div>
-              <div>
-                <label class="block text-xs font-medium text-ink-500 mb-1.5">Alter Preis / UVP (€)</label>
-                <input type="number" step="0.01" v-model.number="form.oldPrice" placeholder="0.00" class="w-full bg-white border border-ink-200 rounded-xl px-4 py-2.5 text-base font-mono text-ink-400 focus:border-neg outline-none transition line-through decoration-ink-300">
-              </div>
-            </div>
-
-            <!-- Bewertungen -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-xs font-medium text-ink-500 mb-1.5">Bewertung (Sterne)</label>
-                <input type="number" step="0.1" min="0" max="5" v-model="form.ratingStars" placeholder="z.B. 4.7" class="w-full bg-white border border-ink-200 rounded-xl px-4 py-2.5 text-sm text-ink-900 focus:border-ink-900 outline-none transition">
-              </div>
-              <div>
-                <label class="block text-xs font-medium text-ink-500 mb-1.5">Anzahl Bewertungen</label>
-                <input type="number" v-model="form.ratingCount" placeholder="z.B. 1850" class="w-full bg-white border border-ink-200 rounded-xl px-4 py-2.5 text-sm text-ink-900 focus:border-ink-900 outline-none transition">
-              </div>
-            </div>
-
-            <!-- STREAMING_CHUNK:Rendering Custom Selectors -->
-            <!-- Händler Auswahl -->
-            <div>
-              <label class="block text-xs font-medium text-ink-500 mb-2">Händler <span class="text-[10px] text-ink-400 font-normal">({{ optionsPool.retailers.length }} verfügbar)</span></label>
-              <div class="flex flex-wrap gap-2">
-                <button v-for="ret in optionsPool.retailers" :key="ret"
-                  @click="form.retailer = (form.retailer === ret ? '' : ret)"
-                  :class="['chip px-3 py-1.5 rounded-lg text-xs font-medium border',
-                           form.retailer === ret ? 'bg-ink-900 text-white border-ink-900' : 'bg-white text-ink-600 border-ink-200 hover:border-ink-400']">
-                  {{ ret }} <i v-if="form.retailer === ret" class="fa-solid fa-check ml-1 text-[10px]"></i>
-                </button>
-
-                <button v-if="!isAddingCustom('retailer')" @click="triggerCustomOption('retailer')" class="px-3 py-1.5 rounded-lg text-xs font-medium border border-dashed border-ink-300 text-ink-400 hover:text-ink-900 hover:border-ink-500 transition">
-                  <i class="fa-solid fa-plus mr-1"></i> Eigener
-                </button>
-                <div v-if="isAddingCustom('retailer')" class="flex items-center space-x-1">
-                  <input type="text" v-model="customInput['retailer']" @keyup.enter="saveCustomOption('retailer', 'retailers', false)" placeholder="Name..." class="bg-white border border-ink-900 rounded-lg px-2 py-1.5 text-xs text-ink-900 outline-none w-32">
-                  <button @click="saveCustomOption('retailer', 'retailers', false)" class="p-1.5 text-accent hover:bg-accent-soft rounded"><i class="fa-solid fa-check"></i></button>
-                  <button @click="cancelCustomOption('retailer')" class="p-1.5 text-neg hover:bg-neg-soft rounded"><i class="fa-solid fa-xmark"></i></button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Versand Auswahl -->
-            <div>
-              <label class="block text-xs font-medium text-ink-500 mb-2">Versand</label>
-              <div class="flex flex-wrap gap-2">
-                <button v-for="ship in optionsPool.shipping" :key="ship"
-                  @click="form.shipping = ship"
-                  :class="['chip px-3 py-1.5 rounded-lg text-xs font-medium border',
-                           form.shipping === ship ? 'bg-ink-900 text-white border-ink-900' : 'bg-white text-ink-600 border-ink-200 hover:border-ink-400']">
-                  {{ ship }} <i v-if="form.shipping === ship" class="fa-solid fa-check ml-1 text-[10px]"></i>
-                </button>
-
-                <button v-if="!isAddingCustom('shipping')" @click="triggerCustomOption('shipping')" class="px-3 py-1.5 rounded-lg text-xs font-medium border border-dashed border-ink-300 text-ink-400 hover:text-ink-900 hover:border-ink-500 transition">
-                  <i class="fa-solid fa-plus mr-1"></i> Eigener
-                </button>
-                <div v-if="isAddingCustom('shipping')" class="flex items-center space-x-1">
-                  <input type="text" v-model="customInput['shipping']" @keyup.enter="saveCustomOption('shipping', 'shipping', false)" placeholder="z.B. 2,99 €..." class="bg-white border border-ink-900 rounded-lg px-2 py-1.5 text-xs text-ink-900 outline-none w-32">
-                  <button @click="saveCustomOption('shipping', 'shipping', false)" class="p-1.5 text-accent hover:bg-accent-soft rounded"><i class="fa-solid fa-check"></i></button>
-                  <button @click="cancelCustomOption('shipping')" class="p-1.5 text-neg hover:bg-neg-soft rounded"><i class="fa-solid fa-xmark"></i></button>
-                </div>
-              </div>
-            </div>
-
-            <!-- STREAMING_CHUNK:Rendering Date and Features (New QoL Improvements) -->
-            <!-- GÜLTIGKEIT (NEU FÜR ALLE KATEGORIEN) -->
-            <div class="bg-ink-50 p-4 rounded-xl border border-ink-200">
-              <label class="block text-xs font-semibold text-ink-700 mb-2 uppercase tracking-wide">
-                <i class="fa-regular fa-clock mr-1"></i> Gültig bis (Enddatum)
-              </label>
-
-              <div class="flex flex-wrap gap-2 mb-3">
-                <button @click="form.validityType = 'date'" :class="form.validityType === 'date' ? 'bg-ink-900 text-white border-ink-900' : 'bg-white text-ink-600 border-ink-200'" class="chip px-3 py-1.5 rounded-lg text-xs font-medium border">
-                  📅 Datum/Uhrzeit
-                </button>
-                <button @click="form.validityType = 'stock'" :class="form.validityType === 'stock' ? 'bg-ink-900 text-white border-ink-900' : 'bg-white text-ink-600 border-ink-200'" class="chip px-3 py-1.5 rounded-lg text-xs font-medium border">
-                  📦 Solange Vorrat reicht
-                </button>
-                <button @click="form.validityType = 'today'" :class="form.validityType === 'today' ? 'bg-ink-900 text-white border-ink-900' : 'bg-white text-ink-600 border-ink-200'" class="chip px-3 py-1.5 rounded-lg text-xs font-medium border">
-                  🌙 Nur heute
-                </button>
-                <button @click="form.validityType = 'none'" :class="form.validityType === 'none' ? 'bg-ink-200 text-ink-700 border-ink-300' : 'bg-white text-ink-400 border-ink-200'" class="chip px-3 py-1.5 rounded-lg text-xs font-medium border">
-                  ❌ Keine Angabe
-                </button>
-              </div>
-
-              <!-- Nativer Kalender -->
-              <Transition name="fade">
-                <div v-if="form.validityType === 'date'" class="mt-2">
-                  <input type="datetime-local" v-model="form.validityDate" class="w-full max-w-sm bg-white border border-ink-200 rounded-xl px-4 py-2 text-sm text-ink-900 focus:border-ink-900 outline-none">
-                </div>
-              </Transition>
-            </div>
-
-            <!-- HIGHLIGHTS / DEAL FEATURES (Automatisierte Texte) -->
-            <div>
-              <div class="flex justify-between items-end mb-2">
-                <label class="block text-xs font-medium text-ink-500">Highlights / Features <span class="text-[10px] text-ink-400 font-normal ml-1">(Mehrfachauswahl — wird auto-übersetzt)</span></label>
-              </div>
-              <div class="flex flex-wrap gap-2">
-                <button v-for="feat in optionsPool.dealFeatures" :key="feat"
-                  @click="toggleFeature(feat)"
-                  :class="['chip px-3 py-1.5 rounded-lg text-xs font-medium border',
-                           form.features.includes(feat) ? 'bg-accent-soft text-accent-dark border-accent-ring' : 'bg-white text-ink-500 border-ink-200 hover:border-ink-400']">
-                  <i v-if="form.features.includes(feat)" class="fa-solid fa-check mr-1 text-[10px]"></i>{{ feat }}
-                </button>
-              </div>
-            </div>
-
-            <!-- Link & Hashtags -->
-            <div class="grid grid-cols-1 gap-4 pt-2 border-t border-ink-200">
-              <div>
-                <label class="block text-xs font-medium text-ink-500 mb-1.5">Deal Link <span class="text-neg">*</span></label>
-                <div class="relative">
-                  <i class="fa-solid fa-link absolute left-3.5 top-3 text-ink-400"></i>
-                  <input type="url" v-model="form.link" placeholder="https://..." class="w-full bg-white border border-ink-200 rounded-xl pl-10 pr-4 py-2.5 text-sm text-ink-900 focus:border-ink-900 outline-none transition">
-                </div>
-              </div>
-              <div>
-                <label class="block text-xs font-medium text-ink-500 mb-1.5">Hashtags</label>
-                <input type="text" v-model="form.hashtags" class="w-full bg-white border border-ink-200 rounded-xl px-4 py-2 text-sm text-ink-600 focus:border-ink-900 outline-none transition">
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- STREAMING_CHUNK:Rendering Dynamic Fields -->
-        <div v-if="selectedCategory.dynamicFields && selectedCategory.dynamicFields.length > 0" class="card rounded-2xl p-6">
-          <h2 class="font-display text-sm font-semibold text-ink-900 uppercase tracking-wide mb-5 flex items-center">
-            <i class="fa-solid fa-sliders text-ink-400 mr-2"></i> {{ selectedCategory.name }} Details
-          </h2>
-
-          <div class="space-y-5">
-            <div v-for="field in selectedCategory.dynamicFields" :key="field.id">
-
-              <div v-if="field.type === 'text'">
-                <label class="block text-xs font-medium text-ink-500 mb-1.5">{{ field.label }}</label>
-                <input type="text" v-model="form.dynamic[field.id]" :placeholder="field.placeholder" class="w-full bg-white border border-ink-200 rounded-xl px-4 py-2.5 text-sm text-ink-900 focus:border-ink-900 outline-none">
-              </div>
-
-              <div v-if="field.type === 'options'">
-                <div class="flex items-center justify-between mb-2">
-                  <label class="block text-xs font-medium text-ink-500">
-                    {{ field.label }}
-                    <span v-if="field.multiSelect" class="text-[10px] text-ink-400 font-normal ml-1">(Mehrfachauswahl)</span>
-                  </label>
-                </div>
-                <div class="flex flex-wrap gap-2">
-                  <button v-for="opt in getOptionsList(field.optionsKey)" :key="opt"
-                    @click="toggleOption(field.id, opt, field.multiSelect)"
-                    :class="['chip px-3 py-1.5 rounded-lg text-xs font-medium border',
-                             isOptionSelected(field.id, opt, field.multiSelect) ? 'bg-ink-900 text-white border-ink-900' : 'bg-white text-ink-600 border-ink-200 hover:border-ink-400']">
-                    {{ opt }} <i v-if="isOptionSelected(field.id, opt, field.multiSelect)" class="fa-solid fa-check ml-1 text-[10px]"></i>
-                  </button>
-
-                  <button v-if="!isAddingCustom(field.id)" @click="triggerCustomOption(field.id)" class="px-3 py-1.5 rounded-lg text-xs font-medium border border-dashed border-ink-300 text-ink-400 hover:text-ink-900 hover:border-ink-500 transition">
-                    <i class="fa-solid fa-plus mr-1"></i> Eigener
-                  </button>
-
-                  <div v-if="isAddingCustom(field.id)" class="flex items-center space-x-1">
-                    <input type="text" v-model="customInput[field.id]" @keyup.enter="saveCustomOption(field.id, field.optionsKey, field.multiSelect)" placeholder="Wert..." class="bg-white border border-ink-900 rounded-lg px-2 py-1.5 text-xs text-ink-900 outline-none w-32">
-                    <button @click="saveCustomOption(field.id, field.optionsKey, field.multiSelect)" class="p-1.5 text-accent hover:bg-accent-soft rounded"><i class="fa-solid fa-check"></i></button>
-                    <button @click="cancelCustomOption(field.id)" class="p-1.5 text-neg hover:bg-neg-soft rounded"><i class="fa-solid fa-xmark"></i></button>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
-
-        <!-- Manuelle Zusatzinfos (Fallback) -->
-        <div class="card rounded-2xl p-6">
-          <label class="block text-xs font-medium text-ink-500 mb-2">Manuelle Zusatzinfo (Wird <span class="text-neg font-semibold">NICHT</span> automatisch übersetzt)</label>
-          <textarea v-model="form.additionalInfo" rows="2" placeholder="Nur für spezielle Hinweise nutzen, die nicht durch Features abgedeckt sind..." class="w-full bg-white border border-ink-200 rounded-xl px-4 py-3 text-sm text-ink-700 focus:border-ink-900 outline-none transition resize-none"></textarea>
-        </div>
-
-      </div>
-
-      <!-- STREAMING_CHUNK:Rendering Telegram Preview -->
-      <!-- RIGHT COLUMN: Vorschau -->
-      <div class="lg:col-span-5 space-y-6 lg:sticky lg:top-20">
-
-        <div class="card rounded-2xl p-1 flex flex-col h-full overflow-hidden">
-
-          <div class="px-5 py-4 border-b border-ink-200 flex items-center justify-between bg-white rounded-t-2xl">
-            <h2 class="font-display text-sm font-semibold text-ink-900 uppercase tracking-wide flex items-center">
-              <i class="fa-brands fa-telegram text-[#2AABEE] mr-2 text-lg"></i> Telegram Vorschau
-            </h2>
-            <label class="flex items-center space-x-2 cursor-pointer text-xs text-ink-500 hover:text-ink-900 transition group">
-              <input type="checkbox" v-model="rawEditMode" @change="syncEditMode" class="rounded text-ink-900 cursor-pointer">
-              <span>Code Editor</span>
-            </label>
-          </div>
-
-          <!-- Telegram Chat Bubble Layout -->
-          <div class="bg-tg-bg flex-1 p-4 overflow-y-auto" style="min-height: 500px; max-height: 700px;">
-
-            <div v-if="!rawEditMode" class="w-full max-w-[95%] bg-tg-bubble rounded-2xl rounded-bl-sm p-4 shadow-sm border border-ink-200 relative">
-              <!-- Decorative Telegram Tail -->
-              <svg viewBox="0 0 11 20" class="absolute -left-[10px] bottom-0 w-[11px] h-[20px] text-tg-bubble fill-current drop-shadow-sm">
-                <path d="M11 0C11 0 11 20 11 20C11 20 0 20 0 20C5 20 11 0 11 0Z"/>
-              </svg>
-
-              <div class="whitespace-pre-wrap font-sans text-[13px] sm:text-sm text-ink-900 leading-[1.6] break-words">{{ generatedPost }}</div>
-
-              <div class="text-right text-[10px] text-ink-400 mt-2 select-none flex justify-end items-center space-x-1">
-                <span>{{ currentTime }}</span>
-                <i class="fa-solid fa-check-double text-[#2AABEE]"></i>
-              </div>
-            </div>
-
-            <!-- RAW Textarea -->
-            <textarea v-else v-model="editablePost" class="w-full h-full min-h-[500px] bg-white border border-ink-200 rounded-xl p-4 text-ink-700 resize-none outline-none whitespace-pre-wrap font-mono text-xs focus:border-ink-900 transition"></textarea>
-          </div>
-
-          <!-- Actions -->
-          <div class="p-4 bg-white rounded-b-2xl border-t border-ink-200">
-            <button @click="copyToClipboard" :disabled="!canGenerate" :class="!canGenerate ? 'opacity-40 cursor-not-allowed' : 'hover:bg-ink-700 active:scale-[0.98]'" class="w-full py-3.5 bg-ink-900 text-white font-semibold text-sm uppercase tracking-wide rounded-xl transition-all duration-150 flex justify-center items-center space-x-2">
-              <i class="fa-regular fa-copy text-lg"></i><span>Kopieren & Posten</span>
-            </button>
-          </div>
-
-        </div>
+    <div class="p-4 md:p-5 space-y-3" v-else>
+      <div class="flex items-center justify-between"><div><div class="text-sm font-semibold">{{postMode==='compare'?'Vergleichsprodukte':'Angebotsliste'}}</div><div class="text-[10px] text-zinc-400">Jede Karte ist unabhängig bearbeitbar.</div></div><button @click="addProduct" class="rounded-xl bg-zinc-950 text-white px-3 py-2 text-xs font-semibold"><i class="fa-solid fa-plus mr-1.5"></i>Hinzufügen</button></div>
+      <div v-for="(p,i) in visibleProducts" :key="p.id" :class="['rounded-2xl border p-4',compact?'bg-white':'bg-zinc-50']">
+       <div class="flex items-center justify-between mb-3"><div class="flex items-center gap-2"><span class="w-7 h-7 rounded-lg bg-white border border-zinc-200 grid place-items-center text-xs font-semibold">{{i+1}}</span><div class="text-xs font-semibold">{{p.title||'Neues Angebot'}}</div></div><div class="flex gap-1"><button @click="move(i,-1)" class="p-2 rounded-lg hover:bg-white text-zinc-400"><i class="fa-solid fa-chevron-up"></i></button><button @click="move(i,1)" class="p-2 rounded-lg hover:bg-white text-zinc-400"><i class="fa-solid fa-chevron-down"></i></button><button @click="duplicate(i)" class="p-2 rounded-lg hover:bg-white text-zinc-400"><i class="fa-regular fa-copy"></i></button><button v-if="products.length>1" @click="remove(i)" class="p-2 rounded-lg hover:bg-red-50 text-red-400"><i class="fa-solid fa-trash"></i></button></div></div>
+       <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <input v-model="p.title" class="field" placeholder="Produktname">
+        <select v-model="p.category" class="field"><option value="">Kategorie auswählen...</option><option v-for="cat in categories" :key="cat.id" :value="cat.name">{{cat.icon}} {{cat.name}}</option><option value="__custom__">✏️ Eigene Kategorie...</option></select>
+        <input v-if="p.category==='__custom__'" v-model="p.categoryCustom" class="field md:col-span-2" placeholder="Eigene Kategorie eingeben...">
+        <input v-model.number="p.price" type="number" step="0.01" class="field" placeholder="Preis (€)">
+        <input v-model.number="p.oldPrice" type="number" step="0.01" class="field" placeholder="UVP / alter Preis (€)">
+        <select v-model="p.platform" class="field"><option value="">Plattform auswählen...</option><option v-for="platform in platformOptions" :key="platform" :value="platform">{{platform}}</option><option value="__custom__">✏️ Eigene Plattform...</option></select>
+        <input v-if="p.platform==='__custom__'" v-model="p.platformCustom" class="field md:col-span-2" placeholder="Eigene Plattform eingeben...">
+        <select v-model="p.retailer" class="field"><option value="">Händler auswählen...</option><option v-for="ret in retailerOptions" :key="ret" :value="ret">{{ret}}</option><option value="__custom__">✏️ Eigener Händler...</option></select>
+        <input v-if="p.retailer==='__custom__'" v-model="p.retailerCustom" class="field md:col-span-2" placeholder="Eigenen Händler eingeben...">
+        <input v-model="p.link" class="field md:col-span-2" placeholder="Deal-Link">
+        <input v-model="p.extra" class="field md:col-span-2" placeholder="Details / Edition / Zustand / Versand">
+       </div>
+       <div class="flex flex-wrap items-center gap-2 mt-3"><button v-for="tag in p.quickTags" :key="tag" @click="p.extra=p.extra?`${p.extra} • ${tag}`:tag" class="text-[10px] px-2 py-1 rounded-full border border-zinc-200 hover:border-zinc-400">+ {{tag}}</button></div>
       </div>
     </div>
-  </main>
+   </div>
 
-  <!-- STREAMING_CHUNK:Rendering Toast Component -->
-  <!-- Toast Message -->
-  <Transition name="fade">
-    <div v-if="toast.show" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-ink-900 text-white px-6 py-3 rounded-full shadow-lg text-sm font-medium flex items-center space-x-3">
-      <i class="fa-solid fa-circle-check text-accent-ring"></i>
-      <span>{{ toast.message }}</span>
+   <div class="card rounded-2xl p-4 flex flex-wrap gap-2 items-center justify-between">
+    <div class="flex flex-wrap gap-2">
+     <button @click="optimize" class="px-3 py-2 rounded-xl border border-zinc-200 text-xs hover:bg-zinc-50"><i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i>Post optimieren</button>
+     <button @click="toggleLanguage('de')" :class="['px-3 py-2 rounded-xl text-xs border',lang==='de'?'bg-zinc-950 text-white':'border-zinc-200']">🇩🇪 DE</button>
+     <button @click="toggleLanguage('en')" :class="['px-3 py-2 rounded-xl text-xs border',lang==='en'?'bg-zinc-950 text-white':'border-zinc-200']">🇬🇧 EN</button>
+     <button @click="toggleLanguage('both')" :class="['px-3 py-2 rounded-xl text-xs border',lang==='both'?'bg-zinc-950 text-white':'border-zinc-200']">DE + EN</button>
     </div>
-  </Transition>
+    <div class="font-mono text-[10px] text-zinc-400">{{charCount}} Zeichen</div>
+   </div>
+  </section>
 
+  <aside class="space-y-4 xl:sticky xl:top-20 self-start">
+   <div class="card rounded-2xl overflow-hidden">
+    <div class="px-5 py-4 border-b border-zinc-200 flex justify-between items-center"><div><div class="font-display font-semibold text-sm">Live Preview</div><div class="text-[10px] text-zinc-400">Telegram-ready</div></div><span class="px-2 py-1 bg-sky-50 text-sky-600 rounded-full text-[10px] font-semibold">LIVE</span></div>
+    <div class="bg-[#EAEEF2] p-4 min-h-[560px] gridbg">
+      <div class="bg-white rounded-2xl rounded-bl-sm p-4 shadow-sm border border-zinc-200 max-h-[680px] overflow-auto scrollbar"><div class="whitespace-pre-wrap text-[13px] leading-[1.65] break-words">{{generatedPost}}</div><div class="mt-3 text-right text-[10px] text-zinc-400">{{time}} ✓✓</div></div>
+    </div>
+    <div class="p-4 border-t border-zinc-200 grid grid-cols-2 gap-2"><button @click="copyPost" class="py-3 rounded-xl border border-zinc-200 text-xs font-semibold hover:bg-zinc-50"><i class="fa-regular fa-copy mr-1.5"></i>Kopieren</button><button @click="openTelegram" class="py-3 rounded-xl bg-[#229ED9] text-white text-xs font-semibold hover:brightness-95"><i class="fa-brands fa-telegram mr-1.5"></i>Telegram</button></div>
+   </div>
+   <div class="card rounded-2xl p-4">
+    <div class="flex items-center justify-between mb-3"><div class="text-xs font-semibold">Deal Health</div><div class="font-mono text-xs">{{score}}/100</div></div>
+    <div class="h-2 rounded-full bg-zinc-100 overflow-hidden"><div class="h-full bg-zinc-900 rounded-full transition-all" :style="{width:score+'%'}"></div></div>
+    <div class="mt-3 space-y-2 text-[10px]"><div v-for="item in health" :key="item.text" class="flex items-center gap-2"><i :class="item.ok?'fa-solid fa-circle-check text-emerald-600':'fa-solid fa-circle-exclamation text-zinc-400'"></i><span>{{item.text}}</span></div></div>
+   </div>
+  </aside>
+ </div>
+</main>
+
+<div v-if="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded-full bg-zinc-950 text-white text-xs shadow-lg">{{toast}}</div>
 </div>
 
-<!-- STREAMING_CHUNK:Initializing Vue Logic -->
 <script>
-const { createApp, ref, computed, reactive, onMounted } = Vue;
-
-createApp({
-  setup() {
-    // --- TRANSLATION DICTIONARY (DE -> EN) ---
-    // Massiv erweiterte Übersetzungstabelle für reibungslose Übersetzung
-    const translationDict = {
-      // Kategorien
-      'Normaler Deal': 'Standard Deal', 'Deal of the Day': 'Deal of the Day', 'Flash Deal': 'Flash Deal',
-      'Freebie / Gratis': 'Freebie / Free', 'Neuerscheinung': 'New Release', 'Gaming Deal': 'Gaming Deal',
-      'Smartphone Deal': 'Smartphone Deal', 'Hardware Deal': 'Hardware Deal', 'Software Deal': 'Software Deal',
-      'Haushalt Deal': 'Household Deal', 'Sonstige Produkte': 'Other Products',
-      'Bücher & Media': 'Books & Media', 'Beauty & Pflege': 'Beauty & Care', 'Baby & Kind': 'Baby & Kids',
-      'Möbel & Wohnen': 'Furniture & Home', 'Reisen & Gutscheine': 'Travel & Vouchers',
-
-      // Zustände
-      'Neu': 'New', 'Wie neu': 'Like new', 'Sehr gut': 'Very good', 'Gut': 'Good', 'Gebraucht': 'Used',
-      'Generalüberholt (Refurbished)': 'Refurbished', 'B-Ware': 'B-Stock', 'Akzeptabel': 'Acceptable',
-
-      // Versand
-      'Kostenlos': 'Free', 'Kostenlos mit Prime': 'Free with Prime', 'Abholung': 'Pick-up only', 'Express Versand': 'Express Shipping',
-
-      // Garantie
-      'Keine Garantie': 'No warranty', 'Keine': 'None', '1 Monat': '1 month', '3 Monate': '3 months', '6 Monate': '6 months',
-      '12 Monate': '12 months', '24 Monate': '24 months', '36 Monate': '36 months', 'Lebenslang': 'Lifetime',
-
-      // Hardware
-      'CPU': 'CPU', 'GPU': 'GPU', 'RAM': 'RAM', 'SSD': 'SSD', 'Mainboard': 'Motherboard', 'Monitor': 'Monitor',
-      'Netzteil': 'Power Supply', 'Gehäuse': 'PC Case', 'Notebook': 'Laptop', 'Zubehör': 'Accessories',
-      'Kühler': 'Cooler', 'Lüfter': 'Fan', 'Tastatur': 'Keyboard', 'Maus': 'Mouse', 'Headset': 'Headset',
-
-      // Game Genres
-      'Action': 'Action', 'RPG': 'RPG', 'Shooter': 'Shooter', 'Sport': 'Sports', 'Strategie': 'Strategy',
-      'Simulator': 'Simulation', 'Adventure': 'Adventure', 'Rennspiel': 'Racing', 'Horror': 'Horror', 'Puzzle': 'Puzzle', 'MMO': 'MMO',
-
-      // Game product types
-      'Spiel': 'Game', 'DLC': 'DLC', 'Konsole': 'Console', 'Controller': 'Controller',
-
-      // Farben
-      'Schwarz': 'Black', 'Silber': 'Silver', 'Space Grau': 'Space Gray', 'Titan': 'Titanium', 'Weiß': 'White',
-      'Mitternacht': 'Midnight', 'Blau': 'Blue', 'Grün': 'Green', 'Rosé': 'Rose Gold', 'Gold': 'Gold', 'Rot': 'Red',
-
-      // Plattformen
-      'Mobile (iOS/Android)': 'Mobile (iOS/Android)', 'VR': 'VR',
-
-      // SIM Types
-      'Dual-SIM': 'Dual SIM', 'eSIM': 'eSIM', 'Single-SIM + eSIM': 'Single SIM + eSIM', 'Nano-SIM': 'Nano SIM',
-
-      // Software Types
-      'Antivirus & Sicherheit': 'Antivirus & Security', 'Office & Produktivität': 'Office & Productivity',
-      'VPN': 'VPN', 'Grafik & Video': 'Graphics & Video', 'Betriebssystem': 'Operating System', 'Cloud-Speicher': 'Cloud Storage',
-      'Kreativ-Suite': 'Creative Suite', 'Entwicklertools': 'Developer Tools',
-
-      // License Types
-      '1-Jahres-Lizenz': '1-Year License', 'Lebenslange Lizenz (Lifetime)': 'Lifetime License', 'Monats-Abo': 'Monthly Subscription', 'Einmalkauf (Lizenzschlüssel)': 'One-time purchase',
-
-      // Devices
-      '1 Gerät': '1 Device', '3 Geräte': '3 Devices', '5 Geräte': '5 Devices', '10 Geräte': '10 Devices', 'Unbegrenzt (PC & Mac)': 'Unlimited (PC & Mac)',
-
-      // Household
-      'Saugroboter': 'Robot Vacuum', 'Kaffeemaschine': 'Coffee Machine', 'Airfryer / Heißluftfritteuse': 'Air Fryer',
-      'Küchenmaschine': 'Food Processor', 'Smart Home & Licht': 'Smart Home & Lighting', 'Werkzeug': 'Tools', 'Waschmaschine': 'Washing Machine',
-      'Luftreiniger': 'Air Purifier', 'Ventilator': 'Fan', 'Heizlüfter': 'Space Heater',
-
-      // Freebies
-      'Gratis-Produkt': 'Free Product', 'Kostenloses Spiel': 'Free Game', 'Test-Abo': 'Free Trial', 'Gutschein / Coupon': 'Voucher / Coupon',
-      'Demo-Version': 'Demo Version',
-      'Keine Registrierung nötig': 'No registration required', 'Kostenloser Account erforderlich': 'Free account required',
-      'Nur für Neukunden': 'New customers only', 'Mit Code-Eingabe': 'Code entry required',
-
-      // Editions
-      'Standard Edition': 'Standard Edition', 'Deluxe Edition': 'Deluxe Edition', "Collector's Edition": "Collector's Edition", 'GOTY Edition': 'GOTY Edition',
-      'Ultimate Edition': 'Ultimate Edition', 'Anniversary Edition': 'Anniversary Edition',
-
-      // Other categories
-      'Mode & Accessoires': 'Fashion & Accessories', 'Sport & Outdoor': 'Sports & Outdoor', 'Garten & Heimwerken': 'Garden & DIY',
-      'Auto & Motorrad': 'Car & Motorcycle', 'Spielzeug & Hobby': 'Toys & Hobbies', 'Gutscheine': 'Vouchers',
-
-      // Bücher & Media
-      'Buch': 'Book', 'Hörbuch': 'Audiobook', 'E-Book': 'E-Book', 'Film / Blu-ray': 'Movie / Blu-ray', 'Vinyl / CD': 'Vinyl / CD',
-      'Roman': 'Novel', 'Sachbuch': 'Non-fiction', 'Fantasy': 'Fantasy', 'Krimi': 'Crime', 'Biografie': 'Biography',
-      'Kinderbuch': "Children's Book", 'Comic / Manga': 'Comic / Manga',
-      'Hardcover': 'Hardcover', 'Taschenbuch': 'Paperback', 'Digital': 'Digital',
-
-      // Beauty & Pflege
-      'Hautpflege': 'Skincare', 'Makeup': 'Makeup', 'Parfum': 'Perfume', 'Haarpflege': 'Hair Care',
-      'Rasur & Bartpflege': 'Shaving & Beard Care', 'Wellness & Massage': 'Wellness & Massage',
-
-      // Baby & Kind
-      'Spielzeug': 'Toys', 'Kleidung': 'Clothing', 'Kinderwagen': 'Stroller', 'Pflege': 'Care', 'Möbel': 'Furniture',
-      'Sicherheit': 'Safety', 'Stillzubehör': 'Nursing Accessories',
-      '0-6 Monate': '0-6 months', '6-12 Monate': '6-12 months', '1-3 Jahre': '1-3 years', '3-6 Jahre': '3-6 years', '6+ Jahre': '6+ years',
-
-      // Möbel & Wohnen
-      'Sofa': 'Sofa', 'Bett': 'Bed', 'Tisch': 'Table', 'Stuhl': 'Chair', 'Regal': 'Shelf', 'Beleuchtung': 'Lighting',
-      'Deko': 'Decor', 'Teppich': 'Rug', 'Holz': 'Wood', 'Metall': 'Metal', 'Stoff': 'Fabric', 'Leder': 'Leather',
-      'Glas': 'Glass', 'Kunststoff': 'Plastic',
-
-      // Reisen
-      'Pauschalreise': 'Package Holiday', 'Hotel': 'Hotel', 'Flug': 'Flight', 'Mietwagen': 'Rental Car',
-      'Gutschein': 'Voucher', 'Erlebnis': 'Experience',
-
-      // Highlights / Features
-      'Historischer Tiefpreis': 'All-time low price',
-      'Bestpreis': 'Best price available',
-      'Nur für Prime-Mitglieder': 'Prime members only',
-      'Gutschein auf der Artikelseite aktivieren': 'Activate coupon on product page',
-      'Cashback möglich': 'Cashback available',
-      'Versandkostenfrei ab 29€': 'Free shipping on orders over 29€',
-      'Versandkostenfrei ab 39€': 'Free shipping on orders over 39€',
-      'Vorbestellung': 'Pre-order',
-      'Limitierte Stückzahl': 'Limited quantity available',
-      'Nur online verfügbar': 'Online only',
-      'Auch im Store erhältlich': 'Also available in-store',
-      'Newsletter-Rabatt': 'Newsletter discount',
-      'App-exklusiv': 'App exclusive',
-      'Erster Kauf-Rabatt': 'First purchase discount'
-    };
-
-    const translate = (deText) => {
-      if(!deText) return '';
-      if(translationDict[deText]) return translationDict[deText];
-      // Fallback für Preise etc. in Strings
-      if(typeof deText === 'string' && deText.includes('€')) return deText.replace(',', '.').replace('€', '€');
-      return deText; // Unbekanntes einfach durchreichen
-    };
-
-    // --- OPTIONS POOL ---
-    // Erweiterbar: neue Werte können einfach per Push oder über "Eigener"-Button ergänzt werden.
-    const optionsPool = reactive({
-      retailers: ['Amazon', 'MediaMarkt', 'Saturn', 'Mindfactory', 'eBay', 'Otto', 'Alternate', 'Cyberport', 'NBB', 'Coolblue', 'Steam', 'Epic Games', 'AliExpress', 'Lidl', 'Aldi', 'Zalando', 'Galaxus', 'Conrad', 'Notebooksbilliger', 'Expert', 'Kaufland'],
-      conditions: ['Neu', 'Wie neu', 'Sehr gut', 'Gut', 'Gebraucht', 'Generalüberholt (Refurbished)', 'B-Ware', 'Akzeptabel'],
-      shipping: ['Kostenlos', 'Kostenlos mit Prime', '1,99 €', '2,99 €', '3,90 €', '3,99 €', '4,99 €', '5,99 €', '6,99 €', '7,99 €', 'Express Versand', 'Abholung'],
-      warranty: ['Keine', '1 Monat', '3 Monate', '6 Monate', '12 Monate', '24 Monate', '36 Monate', 'Lebenslang'],
-      dealFeatures: ['Historischer Tiefpreis', 'Bestpreis', 'Nur für Prime-Mitglieder', 'Gutschein auf der Artikelseite aktivieren', 'Cashback möglich', 'Versandkostenfrei ab 29€', 'Versandkostenfrei ab 39€', 'Vorbestellung', 'Limitierte Stückzahl', 'Nur online verfügbar', 'Auch im Store erhältlich', 'Newsletter-Rabatt', 'App-exklusiv', 'Erster Kauf-Rabatt'],
-
-      platforms: ['PC', 'PS5', 'Xbox Series X/S', 'PS4', 'Xbox One', 'Nintendo Switch', 'Mobile (iOS/Android)', 'VR'],
-      gameTypes: ['Spiel', 'DLC', 'Zubehör', 'Konsole', 'Controller'],
-      genres: ['Action', 'RPG', 'Shooter', 'Sport', 'Strategie', 'Simulator', 'Adventure', 'Rennspiel', 'Horror', 'Puzzle', 'MMO'],
-      hwCategories: ['CPU', 'GPU', 'RAM', 'SSD', 'Mainboard', 'Monitor', 'Netzteil', 'Gehäuse', 'Notebook', 'Kühler', 'Lüfter', 'Tastatur', 'Maus', 'Headset', 'Zubehör'],
-      brands: ['Apple', 'Samsung', 'Xiaomi', 'Google', 'Sony', 'Asus', 'Lenovo', 'LG', 'Philips', 'Bosch', 'Dyson', 'Nintendo', 'Microsoft', 'Dell', 'HP', 'Acer', 'JBL', 'Bose', 'Anker', 'Logitech'],
-      storage: ['32 GB', '64 GB', '128 GB', '256 GB', '512 GB', '1 TB', '2 TB', '4 TB'],
-      colors: ['Schwarz', 'Silber', 'Space Grau', 'Titan', 'Weiß', 'Mitternacht', 'Blau', 'Grün', 'Rosé', 'Gold', 'Rot'],
-      simTypes: ['Dual-SIM', 'eSIM', 'Single-SIM + eSIM', 'Nano-SIM'],
-      softwareTypes: ['Antivirus & Sicherheit', 'Office & Produktivität', 'VPN', 'Grafik & Video', 'Betriebssystem', 'Cloud-Speicher', 'Kreativ-Suite', 'Entwicklertools'],
-      licenseTypes: ['1-Jahres-Lizenz', 'Lebenslange Lizenz (Lifetime)', 'Monats-Abo', 'Einmalkauf (Lizenzschlüssel)'],
-      deviceCounts: ['1 Gerät', '3 Geräte', '5 Geräte', '10 Geräte', 'Unbegrenzt (PC & Mac)'],
-      householdCategories: ['Saugroboter', 'Kaffeemaschine', 'Airfryer / Heißluftfritteuse', 'Küchenmaschine', 'Smart Home & Licht', 'Werkzeug', 'Waschmaschine', 'Luftreiniger', 'Ventilator', 'Heizlüfter'],
-      freebieTypes: ['Gratis-Produkt', 'Kostenloses Spiel', 'Test-Abo', 'Gutschein / Coupon', 'Demo-Version'],
-      freebieRequirements: ['Keine Registrierung nötig', 'Kostenloser Account erforderlich', 'Nur für Neukunden', 'Mit Code-Eingabe'],
-      editions: ['Standard Edition', 'Deluxe Edition', "Collector's Edition", 'GOTY Edition', 'Ultimate Edition', 'Anniversary Edition'],
-      otherCategories: ['Mode & Accessoires', 'Sport & Outdoor', 'Garten & Heimwerken', 'Auto & Motorrad', 'Spielzeug & Hobby', 'Gutscheine'],
-
-      // Neue Pools für erweiterte Kategorien
-      bookMediaTypes: ['Buch', 'Hörbuch', 'E-Book', 'Film / Blu-ray', 'Vinyl / CD'],
-      bookGenres: ['Roman', 'Sachbuch', 'Fantasy', 'Krimi', 'Biografie', 'Kinderbuch', 'Comic / Manga'],
-      bookFormats: ['Hardcover', 'Taschenbuch', 'Digital'],
-      beautyCategories: ['Hautpflege', 'Makeup', 'Parfum', 'Haarpflege', 'Rasur & Bartpflege', 'Wellness & Massage'],
-      beautyBrands: ["Nivea", "L'Oréal", "Rituals", "The Ordinary", "Kneipp", "Braun", "Gillette", "Philips"],
-      babyCategories: ['Spielzeug', 'Kleidung', 'Kinderwagen', 'Pflege', 'Möbel', 'Sicherheit', 'Stillzubehör'],
-      ageGroups: ['0-6 Monate', '6-12 Monate', '1-3 Jahre', '3-6 Jahre', '6+ Jahre'],
-      furnitureCategories: ['Sofa', 'Bett', 'Tisch', 'Stuhl', 'Regal', 'Beleuchtung', 'Deko', 'Teppich'],
-      materials: ['Holz', 'Metall', 'Stoff', 'Leder', 'Glas', 'Kunststoff'],
-      travelTypes: ['Pauschalreise', 'Hotel', 'Flug', 'Mietwagen', 'Gutschein', 'Erlebnis']
-    });
-
-    // --- STREAMING_CHUNK:Defining Categories Data ---
-    // 16 CATEGORIES DEFINITION — datengetrieben & leicht erweiterbar:
-    // neue Kategorie = neuer Eintrag mit id, name, icon, headerDE/EN, hashtags, dynamicFields
-    const categories = [
-      { id: 'normal', name: 'Normaler Deal', icon: '🔥', headerDE: '🔥 DEAL ALERT | ANGEBOT', headerEN: '🔥 DEAL ALERT | OFFER', hashtags: '#CyberDealz #Deal #Offer', dynamicFields: [] },
-
-      { id: 'dotd', name: 'Deal of the Day', icon: '🏆', headerDE: '🏆 DEAL OF THE DAY | TAGESANGEBOT', headerEN: '🏆 DEAL OF THE DAY | OFFER', hashtags: '#CyberDealz #DealOfTheDay #Tagesangebot',
-        dynamicFields: [
-          { id: 'condition', label: 'Zustand', type: 'options', optionsKey: 'conditions' }
-        ]
-      },
-
-      { id: 'flash', name: 'Flash Deal', icon: '⚡', headerDE: '⚡ FLASH DEAL | BLITZANGEBOT', headerEN: '⚡ FLASH DEAL | LIMITED OFFER', hashtags: '#CyberDealz #FlashDeal #Blitzangebot #LimitedTime',
-        dynamicFields: [
-          { id: 'condition', label: 'Zustand', type: 'options', optionsKey: 'conditions' }
-        ]
-      },
-
-      { id: 'freebie', name: 'Freebie / Gratis', icon: '🆓', headerDE: '🆓 FREEBIE | GRATIS ANGEBOT', headerEN: '🆓 FREEBIE | FREE OFFER', hashtags: '#CyberDealz #Freebie #Gratis #Kostenlos',
-        dynamicFields: [
-          { id: 'freebieType', label: 'Angebot-Art', type: 'options', optionsKey: 'freebieTypes' },
-          { id: 'requirement', label: 'Voraussetzung', type: 'options', optionsKey: 'freebieRequirements' }
-        ]
-      },
-
-      { id: 'newrelease', name: 'Neuerscheinung', icon: '🆕', headerDE: '🆕 NEUERSCHEINUNG | HIGHLIGHT', headerEN: '🆕 NEW RELEASE | HIGHLIGHT', hashtags: '#CyberDealz #Neuerscheinung #NewRelease #PreOrder',
-        dynamicFields: [
-          { id: 'brand', label: 'Hersteller / Publisher', type: 'options', optionsKey: 'brands' },
-          { id: 'edition', label: 'Edition', type: 'options', optionsKey: 'editions' }
-        ]
-      },
-
-      { id: 'gaming', name: 'Gaming Deal', icon: '🎮', headerDE: '🎮 GAMING DEAL | GAME ANGEBOT', headerEN: '🎮 GAMING DEAL | GAME OFFER', hashtags: '#CyberDealz #GamingDeal #GameDeal #Gaming',
-        dynamicFields: [
-          { id: 'platform', label: 'Plattform', type: 'options', optionsKey: 'platforms', multiSelect: true },
-          { id: 'productType', label: 'Produktart', type: 'options', optionsKey: 'gameTypes' },
-          { id: 'genre', label: 'Genre', type: 'options', optionsKey: 'genres', multiSelect: true },
-          { id: 'condition', label: 'Zustand', type: 'options', optionsKey: 'conditions' }
-        ]
-      },
-
-      { id: 'smartphone', name: 'Smartphone Deal', icon: '📱', headerDE: '📱 SMARTPHONE DEAL | HANDY ANGEBOT', headerEN: '📱 SMARTPHONE DEAL | MOBILE OFFER', hashtags: '#CyberDealz #SmartphoneDeal #Mobile #Tech',
-        dynamicFields: [
-          { id: 'brand', label: 'Hersteller', type: 'options', optionsKey: 'brands' },
-          { id: 'storage', label: 'Speichergröße', type: 'options', optionsKey: 'storage' },
-          { id: 'color', label: 'Farbe', type: 'options', optionsKey: 'colors' },
-          { id: 'simType', label: 'SIM-Typ', type: 'options', optionsKey: 'simTypes' },
-          { id: 'condition', label: 'Zustand', type: 'options', optionsKey: 'conditions' },
-          { id: 'warranty', label: 'Garantie', type: 'options', optionsKey: 'warranty' }
-        ]
-      },
-
-      { id: 'hardware', name: 'Hardware Deal', icon: '💻', headerDE: '💻 HARDWARE DEAL | TECH ANGEBOT', headerEN: '💻 HARDWARE DEAL | TECH OFFER', hashtags: '#CyberDealz #TechDeal #PCHardware #PCDeal',
-        dynamicFields: [
-          { id: 'hwCat', label: 'Komponente', type: 'options', optionsKey: 'hwCategories' },
-          { id: 'brand', label: 'Hersteller', type: 'options', optionsKey: 'brands' },
-          { id: 'condition', label: 'Zustand', type: 'options', optionsKey: 'conditions' },
-          { id: 'warranty', label: 'Garantie', type: 'options', optionsKey: 'warranty' }
-        ]
-      },
-
-      { id: 'software', name: 'Software Deal', icon: '🖥️', headerDE: '🖥️ SOFTWARE DEAL | APP ANGEBOT', headerEN: '🖥️ SOFTWARE DEAL | APP OFFER', hashtags: '#CyberDealz #SoftwareDeal #Software #AppDeal',
-        dynamicFields: [
-          { id: 'softwareType', label: 'Software-Art', type: 'options', optionsKey: 'softwareTypes' },
-          { id: 'licenseType', label: 'Lizenz-Typ', type: 'options', optionsKey: 'licenseTypes' },
-          { id: 'devices', label: 'Geräte-Anzahl', type: 'options', optionsKey: 'deviceCounts' }
-        ]
-      },
-
-      { id: 'haushalt', name: 'Haushalt Deal', icon: '🏠', headerDE: '🏠 HAUSHALT DEAL | HOME ANGEBOT', headerEN: '🏠 HOUSEHOLD DEAL | HOME OFFER', hashtags: '#CyberDealz #Haushalt #SmartHome #HomeDeal',
-        dynamicFields: [
-          { id: 'householdCat', label: 'Geräte-Typ', type: 'options', optionsKey: 'householdCategories' },
-          { id: 'brand', label: 'Hersteller', type: 'options', optionsKey: 'brands' },
-          { id: 'condition', label: 'Zustand', type: 'options', optionsKey: 'conditions' },
-          { id: 'warranty', label: 'Garantie', type: 'options', optionsKey: 'warranty' }
-        ]
-      },
-
-      { id: 'books', name: 'Bücher & Media', icon: '📚', headerDE: '📚 MEDIA DEAL | BÜCHER ANGEBOT', headerEN: '📚 MEDIA DEAL | BOOKS OFFER', hashtags: '#CyberDealz #Bücher #Media #Lesetipp',
-        dynamicFields: [
-          { id: 'mediaType', label: 'Medientyp', type: 'options', optionsKey: 'bookMediaTypes' },
-          { id: 'bookGenre', label: 'Genre', type: 'options', optionsKey: 'bookGenres', multiSelect: true },
-          { id: 'format', label: 'Format', type: 'options', optionsKey: 'bookFormats' }
-        ]
-      },
-
-      { id: 'beauty', name: 'Beauty & Pflege', icon: '💄', headerDE: '💄 BEAUTY DEAL | PFLEGE ANGEBOT', headerEN: '💄 BEAUTY DEAL | CARE OFFER', hashtags: '#CyberDealz #Beauty #Pflege #Skincare',
-        dynamicFields: [
-          { id: 'beautyCat', label: 'Kategorie', type: 'options', optionsKey: 'beautyCategories' },
-          { id: 'brand', label: 'Marke', type: 'options', optionsKey: 'beautyBrands' }
-        ]
-      },
-
-      { id: 'baby', name: 'Baby & Kind', icon: '🍼', headerDE: '🍼 BABY DEAL | KINDER ANGEBOT', headerEN: '🍼 BABY DEAL | KIDS OFFER', hashtags: '#CyberDealz #Baby #Kind #Kinderzimmer',
-        dynamicFields: [
-          { id: 'babyCat', label: 'Kategorie', type: 'options', optionsKey: 'babyCategories' },
-          { id: 'ageGroup', label: 'Altersgruppe', type: 'options', optionsKey: 'ageGroups' },
-          { id: 'brand', label: 'Marke', type: 'options', optionsKey: 'brands' }
-        ]
-      },
-
-      { id: 'furniture', name: 'Möbel & Wohnen', icon: '🛋️', headerDE: '🛋️ WOHN DEAL | MÖBEL ANGEBOT', headerEN: '🛋️ HOME DEAL | FURNITURE OFFER', hashtags: '#CyberDealz #Möbel #Wohnen #Einrichtung',
-        dynamicFields: [
-          { id: 'furnitureCat', label: 'Möbel-Typ', type: 'options', optionsKey: 'furnitureCategories' },
-          { id: 'material', label: 'Material', type: 'options', optionsKey: 'materials' }
-        ]
-      },
-
-      { id: 'travel', name: 'Reisen & Gutscheine', icon: '✈️', headerDE: '✈️ REISE DEAL | URLAUB ANGEBOT', headerEN: '✈️ TRAVEL DEAL | HOLIDAY OFFER', hashtags: '#CyberDealz #Reisen #Urlaub #TravelDeal',
-        dynamicFields: [
-          { id: 'travelType', label: 'Reise-Art', type: 'options', optionsKey: 'travelTypes' },
-          { id: 'destination', label: 'Reiseziel', type: 'text', placeholder: 'z.B. Mallorca, Türkei, Bali...' }
-        ]
-      },
-
-      { id: 'other', name: 'Sonstige Produkte', icon: '🎁', headerDE: '🎁 SPECIAL DEAL | TOP ANGEBOT', headerEN: '🎁 SPECIAL DEAL | TOP OFFER', hashtags: '#CyberDealz #Deal #Bargain #Angebote',
-        dynamicFields: [
-          { id: 'categoryName', label: 'Sparte', type: 'options', optionsKey: 'otherCategories' },
-          { id: 'condition', label: 'Zustand', type: 'options', optionsKey: 'conditions' }
-        ]
-      }
-    ];
-
-    // --- STREAMING_CHUNK:Setting up Reactive State ---
-    const selectedCategory = ref(categories[0]);
-    const categorySearch = ref('');
-    const filteredCategories = computed(() => {
-      const q = categorySearch.value.trim().toLowerCase();
-      if(!q) return categories;
-      return categories.filter(c => c.name.toLowerCase().includes(q));
-    });
-
-    const form = reactive({
-      title: '', newPrice: null, oldPrice: null, ratingStars: '', ratingCount: '',
-      link: '', retailer: '', hashtags: categories[0].hashtags, additionalInfo: '',
-      shipping: 'Kostenlos',
-      validityType: 'none', // 'none', 'date', 'stock', 'today'
-      validityDate: '',
-      features: [], // array of selected highlight features
-      dynamic: {}
-    });
-
-    const rawEditMode = ref(false);
-    const editablePost = ref('');
-    const toast = ref({ show: false, message: '' });
-    const currentTime = ref('');
-
-    onMounted(() => {
-      updateTime();
-      setInterval(updateTime, 60000);
-    });
-
-    const updateTime = () => {
-      const d = new Date();
-      currentTime.value = d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-    };
-
-    // Custom Options System State (Vereinfacht - ohne Warnmodal)
-    const activeCustomInputs = reactive({});
-    const customInput = reactive({});
-
-    // --- LOGIC ---
-    const selectCategory = (cat) => {
-      selectedCategory.value = cat;
-      form.hashtags = cat.hashtags;
-      form.dynamic = {};
-    };
-
-    const getOptionsList = (key) => optionsPool[key] || [];
-
-    const toggleOption = (fieldId, opt, isMultiSelect = false) => {
-      if (isMultiSelect) {
-        if (!Array.isArray(form.dynamic[fieldId])) form.dynamic[fieldId] = [];
-        const index = form.dynamic[fieldId].indexOf(opt);
-        if (index > -1) form.dynamic[fieldId].splice(index, 1);
-        else form.dynamic[fieldId].push(opt);
-      } else {
-        if (form.dynamic[fieldId] === opt) form.dynamic[fieldId] = '';
-        else form.dynamic[fieldId] = opt;
-      }
-    };
-
-    const toggleFeature = (feat) => {
-      const idx = form.features.indexOf(feat);
-      if (idx > -1) form.features.splice(idx, 1);
-      else form.features.push(feat);
-    };
-
-    const isOptionSelected = (fieldId, opt, isMultiSelect = false) => {
-      if (isMultiSelect) return Array.isArray(form.dynamic[fieldId]) && form.dynamic[fieldId].includes(opt);
-      return form.dynamic[fieldId] === opt;
-    };
-
-    const triggerCustomOption = (fieldId) => {
-      activeCustomInputs[fieldId] = true;
-    };
-
-    const isAddingCustom = (fieldId) => !!activeCustomInputs[fieldId];
-
-    const saveCustomOption = (fieldId, optionsKey, isMultiSelect = false) => {
-      const val = customInput[fieldId]?.trim();
-      if (val) {
-        // Speichere in Pool falls neu — so wächst die App mit jeder Nutzung
-        if (optionsPool[optionsKey] && !optionsPool[optionsKey].includes(val)) {
-          optionsPool[optionsKey].push(val);
-        }
-        // Weise Wert zu
-        if (fieldId === 'retailer') {
-          form.retailer = val;
-        } else if (fieldId === 'shipping') {
-          form.shipping = val;
-        } else if (isMultiSelect) {
-          if (!Array.isArray(form.dynamic[fieldId])) form.dynamic[fieldId] = [];
-          if (!form.dynamic[fieldId].includes(val)) form.dynamic[fieldId].push(val);
-        } else {
-          form.dynamic[fieldId] = val;
-        }
-      }
-      cancelCustomOption(fieldId);
-    };
-
-    const cancelCustomOption = (fieldId) => {
-      activeCustomInputs[fieldId] = false;
-      customInput[fieldId] = '';
-    };
-
-    // --- STREAMING_CHUNK:Implementing Calculations and Formatting ---
-    const canGenerate = computed(() => form.title.trim().length > 0 && form.newPrice !== null && form.newPrice >= 0);
-
-    const discountInfo = computed(() => {
-      const n = parseFloat(form.newPrice) || 0;
-      const o = parseFloat(form.oldPrice) || 0;
-      if (o <= 0 || n >= o) return null;
-      const percent = Math.round(((o - n) / o) * 100);
-      const saved = (o - n).toFixed(2).replace('.', ',');
-      return { percent, saved };
-    });
-
-    const formatPrice = (val) => (val !== null && val !== undefined && val !== '') ? parseFloat(val).toFixed(2).replace('.', ',') + ' €' : '';
-
-    const formatVal = (val) => {
-      if (Array.isArray(val)) return val.join(', ');
-      return val || '';
-    };
-
-    const translateVal = (val) => {
-      if (Array.isArray(val)) return val.map(v => translate(v)).join(', ');
-      return translate(val);
-    };
-
-    // Datumsformatierung
-    const formatDateDE = (isoString) => {
-        if(!isoString) return '';
-        const d = new Date(isoString);
-        if(isNaN(d.getTime())) return isoString;
-        return d.toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' Uhr';
-    };
-
-    const formatDateEN = (isoString) => {
-        if(!isoString) return '';
-        const d = new Date(isoString);
-        if(isNaN(d.getTime())) return isoString;
-        return d.toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
-    };
-
-    // --- STREAMING_CHUNK:Implementing Template Generation ---
-    const generatedPost = computed(() => {
-      if (!canGenerate.value) return "Warte auf Eingabe... Bitte Produktname und Preis ausfüllen.";
-
-      const d = form;
-      const dyn = form.dynamic;
-      const cat = selectedCategory.value;
-      const disc = discountInfo.value;
-
-      const priceStr = formatPrice(d.newPrice);
-      const oldStr = formatPrice(d.oldPrice);
-
-      let ratingStrDE = ''; let ratingStrEN = '';
-      if(d.ratingStars) {
-        ratingStrDE = `\n⭐ Bewertung:\n${d.ratingStars} ⭐ ${d.ratingCount ? '| ' + d.ratingCount + ' Bewertungen' : ''}\n`;
-        ratingStrEN = `\n⭐ Rating:\n${d.ratingStars} ⭐ ${d.ratingCount ? '| ' + d.ratingCount + ' reviews' : ''}\n`;
-      }
-
-      // Gültigkeit / Enddatum verarbeiten
-      let validityDE = ''; let validityEN = '';
-      if (d.validityType === 'date' && d.validityDate) {
-          validityDE = formatDateDE(d.validityDate);
-          validityEN = formatDateEN(d.validityDate);
-      } else if (d.validityType === 'stock') {
-          validityDE = 'Solange der Vorrat reicht';
-          validityEN = 'While stocks last';
-      } else if (d.validityType === 'today') {
-          validityDE = 'Nur heute bis 23:59 Uhr';
-          validityEN = 'Today only until 11:59 PM';
-      }
-
-      // Highlights verarbeiten
-      let featuresDE = ''; let featuresEN = '';
-      if (d.features && d.features.length > 0) {
-          featuresDE = `\n✨ Highlights:\n` + d.features.map(f => `• ${f}`).join('\n') + `\n`;
-          featuresEN = `\n✨ Highlights:\n` + d.features.map(f => `• ${translate(f)}`).join('\n') + `\n`;
-      }
-
-      // Dynamische Felder Text aufbauen
-      let extraDe = ''; let extraEn = '';
-      if(dyn.brand) { extraDe += `🏭 Hersteller:\n${formatVal(dyn.brand)}\n\n`; extraEn += `🏭 Brand:\n${formatVal(dyn.brand)}\n\n`; }
-      if(dyn.condition) { extraDe += `📦 Zustand:\n${formatVal(dyn.condition)}\n\n`; extraEn += `📦 Condition:\n${translateVal(dyn.condition)}\n\n`; }
-      if(dyn.warranty) { extraDe += `🛡 Garantie:\n${formatVal(dyn.warranty)}\n\n`; extraEn += `🛡 Warranty:\n${translateVal(dyn.warranty)}\n\n`; }
-      if(dyn.storage) { extraDe += `💾 Speicher:\n${formatVal(dyn.storage)}\n\n`; extraEn += `💾 Storage:\n${formatVal(dyn.storage)}\n\n`; }
-      if(dyn.color) { extraDe += `🎨 Farbe:\n${formatVal(dyn.color)}\n\n`; extraEn += `🎨 Color:\n${translateVal(dyn.color)}\n\n`; }
-      if(dyn.simType) { extraDe += `📶 SIM-Typ:\n${formatVal(dyn.simType)}\n\n`; extraEn += `📶 SIM Type:\n${translateVal(dyn.simType)}\n\n`; }
-      if(dyn.platform) { extraDe += `🎮 Plattform:\n${formatVal(dyn.platform)}\n\n`; extraEn += `🎮 Platform:\n${translateVal(dyn.platform)}\n\n`; }
-      if(dyn.productType) { extraDe += `🕹️ Produktart:\n${formatVal(dyn.productType)}\n\n`; extraEn += `🕹️ Type:\n${translateVal(dyn.productType)}\n\n`; }
-      if(dyn.genre) { extraDe += `🎭 Genre:\n${formatVal(dyn.genre)}\n\n`; extraEn += `🎭 Genre:\n${translateVal(dyn.genre)}\n\n`; }
-      if(dyn.hwCat) { extraDe += `⚙️ Komponente:\n${formatVal(dyn.hwCat)}\n\n`; extraEn += `⚙️ Component:\n${translateVal(dyn.hwCat)}\n\n`; }
-      if(dyn.softwareType) { extraDe += `💻 Software:\n${formatVal(dyn.softwareType)}\n\n`; extraEn += `💻 Software:\n${translateVal(dyn.softwareType)}\n\n`; }
-      if(dyn.licenseType) { extraDe += `🔑 Lizenz:\n${formatVal(dyn.licenseType)}\n\n`; extraEn += `🔑 License:\n${translateVal(dyn.licenseType)}\n\n`; }
-      if(dyn.devices) { extraDe += `📱 Geräte:\n${formatVal(dyn.devices)}\n\n`; extraEn += `📱 Devices:\n${translateVal(dyn.devices)}\n\n`; }
-      if(dyn.householdCat) { extraDe += `🏠 Geräte-Typ:\n${formatVal(dyn.householdCat)}\n\n`; extraEn += `🏠 Appliance Type:\n${translateVal(dyn.householdCat)}\n\n`; }
-      if(dyn.freebieType) { extraDe += `🎁 Angebot-Typ:\n${formatVal(dyn.freebieType)}\n\n`; extraEn += `🎁 Offer Type:\n${translateVal(dyn.freebieType)}\n\n`; }
-      if(dyn.requirement) { extraDe += `📋 Bedingung:\n${formatVal(dyn.requirement)}\n\n`; extraEn += `📋 Requirement:\n${translateVal(dyn.requirement)}\n\n`; }
-      if(dyn.edition) { extraDe += `🌟 Edition:\n${formatVal(dyn.edition)}\n\n`; extraEn += `🌟 Edition:\n${translateVal(dyn.edition)}\n\n`; }
-      if(dyn.categoryName) { extraDe += `📁 Sparte:\n${formatVal(dyn.categoryName)}\n\n`; extraEn += `📁 Subcategory:\n${translateVal(dyn.categoryName)}\n\n`; }
-      if(dyn.mediaType) { extraDe += `📖 Medientyp:\n${formatVal(dyn.mediaType)}\n\n`; extraEn += `📖 Media Type:\n${translateVal(dyn.mediaType)}\n\n`; }
-      if(dyn.bookGenre) { extraDe += `📚 Genre:\n${formatVal(dyn.bookGenre)}\n\n`; extraEn += `📚 Genre:\n${translateVal(dyn.bookGenre)}\n\n`; }
-      if(dyn.format) { extraDe += `📄 Format:\n${formatVal(dyn.format)}\n\n`; extraEn += `📄 Format:\n${translateVal(dyn.format)}\n\n`; }
-      if(dyn.beautyCat) { extraDe += `💄 Kategorie:\n${formatVal(dyn.beautyCat)}\n\n`; extraEn += `💄 Category:\n${translateVal(dyn.beautyCat)}\n\n`; }
-      if(dyn.babyCat) { extraDe += `🍼 Kategorie:\n${formatVal(dyn.babyCat)}\n\n`; extraEn += `🍼 Category:\n${translateVal(dyn.babyCat)}\n\n`; }
-      if(dyn.ageGroup) { extraDe += `🎂 Altersgruppe:\n${formatVal(dyn.ageGroup)}\n\n`; extraEn += `🎂 Age Group:\n${translateVal(dyn.ageGroup)}\n\n`; }
-      if(dyn.furnitureCat) { extraDe += `🛋️ Möbel-Typ:\n${formatVal(dyn.furnitureCat)}\n\n`; extraEn += `🛋️ Furniture Type:\n${translateVal(dyn.furnitureCat)}\n\n`; }
-      if(dyn.material) { extraDe += `🪵 Material:\n${formatVal(dyn.material)}\n\n`; extraEn += `🪵 Material:\n${translateVal(dyn.material)}\n\n`; }
-      if(dyn.travelType) { extraDe += `✈️ Reise-Art:\n${formatVal(dyn.travelType)}\n\n`; extraEn += `✈️ Travel Type:\n${translateVal(dyn.travelType)}\n\n`; }
-      if(dyn.destination) { extraDe += `📍 Reiseziel:\n${formatVal(dyn.destination)}\n\n`; extraEn += `📍 Destination:\n${formatVal(dyn.destination)}\n\n`; }
-
-      const headerTitleDE = (cat && cat.headerDE ? cat.headerDE : '🔥 DEAL ALERT | ANGEBOT').toUpperCase();
-      const headerTitleEN = (cat && cat.headerEN ? cat.headerEN : '🔥 DEAL ALERT | OFFER').toUpperCase();
-
-      // --- DEUTSCH ---
-      let post = `${headerTitleDE}\n\n🇩🇪 Deutsch\n\n`;
-      post += `🛒 Produkt:\n${d.title}\n\n`;
-      if(d.retailer) post += `🏪 Händler:\n${d.retailer}\n\n`;
-      post += `🏷️ Kategorie:\n${cat.name}\n\n`;
-
-      if(extraDe) post += extraDe;
-
-      post += `💰 Preis:\n${priceStr}\n`;
-      if(oldStr) post += `\n❌ Statt:\n${oldStr}\n`;
-      if(disc) post += `\n📉 Ersparnis:\n${disc.percent} % Rabatt / ${disc.saved} € gespart\n`;
-
-      post += ratingStrDE;
-
-      if(validityDE) post += `\n⏳ Gültig bis:\n${validityDE}\n`;
-
-      post += `\n🚚 Versand:\n${d.shipping}\n`;
-
-      post += featuresDE;
-
-      post += `\n🔗 Zum Angebot:\n${d.link || '[Link hier einfügen]'}\n`;
-      if(d.additionalInfo) post += `\n📌 Info:\n${d.additionalInfo}\n`;
-
-      post += `\n━━━━━━━━━━━━━━\n\n`;
-
-      // --- ENGLISH ---
-      post += `🇬🇧 English\n\n${headerTitleEN}\n\n`;
-      post += `🛒 Product:\n${d.title}\n\n`;
-      if(d.retailer) post += `🏪 Retailer:\n${d.retailer}\n\n`;
-      post += `🏷️ Category:\n${translate(cat.name)}\n\n`;
-
-      if(extraEn) post += extraEn;
-
-      post += `💰 Price:\n${formatPrice(d.newPrice).replace(',', '.')}\n`;
-      if(oldStr) post += `\n❌ Was:\n${formatPrice(d.oldPrice).replace(',', '.')}\n`;
-      if(disc) post += `\n📉 Discount:\n${disc.percent}% OFF / Save ${disc.saved.replace(',', '.')} €\n`;
-
-      post += ratingStrEN;
-
-      if(validityEN) post += `\n⏳ Valid until:\n${validityEN}\n`;
-
-      post += `\n🚚 Shipping:\n${translate(d.shipping)}\n`;
-
-      post += featuresEN;
-
-      post += `\n🔗 Deal link:\n${d.link || '[Insert link here]'}\n`;
-      if(d.additionalInfo) post += `\n📌 Info:\n${d.additionalInfo}\n`;
-
-      // HASHTAGS
-      if(d.hashtags) post += `\n${d.hashtags}`;
-
-      return post;
-    });
-
-    const syncEditMode = () => {
-      if(rawEditMode.value) {
-        editablePost.value = generatedPost.value;
-      }
-    };
-
-    const copyToClipboard = () => {
-      if(!canGenerate.value) return;
-      const text = rawEditMode.value ? editablePost.value : generatedPost.value;
-
-      const textarea = document.createElement("textarea");
-      textarea.value = text;
-      textarea.style.position = "fixed";
-      textarea.style.opacity = "0";
-      document.body.appendChild(textarea);
-      textarea.select();
-      try {
-        document.execCommand('copy');
-        toast.value.message = 'Erfolgreich kopiert! Bereit für Telegram.';
-        toast.value.show = true;
-        setTimeout(() => toast.value.show = false, 3000);
-      } catch (err) {
-        console.error('Kopieren fehlgeschlagen', err);
-      }
-      document.body.removeChild(textarea);
-    };
-
-    const resetApp = () => {
-      form.title = ''; form.newPrice = null; form.oldPrice = null;
-      form.ratingStars = ''; form.ratingCount = ''; form.link = '';
-      form.retailer = ''; form.additionalInfo = '';
-      form.validityType = 'none'; form.validityDate = ''; form.features = [];
-      form.dynamic = {};
-      rawEditMode.value = false;
-    };
-
-    return {
-      categories, selectedCategory, selectCategory, categorySearch, filteredCategories,
-      form, generatedPost, discountInfo, canGenerate,
-      rawEditMode, editablePost, syncEditMode,
-      copyToClipboard, resetApp, toast, optionsPool, currentTime,
-
-      // Smart Options System
-      getOptionsList, toggleOption, toggleFeature, isOptionSelected, triggerCustomOption,
-      isAddingCustom, customInput, saveCustomOption, cancelCustomOption
-    };
-  }
-}).mount('#app');
+const {createApp,reactive,ref,computed,onMounted}=Vue;
+ const categories=[
+  {id:'normal',name:'Normaler Deal',icon:'🔥'},
+  {id:'dotd',name:'Deal of the Day',icon:'🏆'},
+  {id:'flash',name:'Flash Deal',icon:'⚡'},
+  {id:'freebie',name:'Freebie / Gratis',icon:'🆓'},
+  {id:'newrelease',name:'Neuerscheinung',icon:'🆕'},
+  {id:'gaming',name:'Gaming Deal',icon:'🎮'},
+  {id:'smartphone',name:'Smartphone Deal',icon:'📱'},
+  {id:'hardware',name:'Hardware Deal',icon:'💻'},
+  {id:'software',name:'Software Deal',icon:'🖥️'},
+  {id:'haushalt',name:'Haushalt Deal',icon:'🏠'},
+  {id:'books',name:'Bücher & Media',icon:'📚'},
+  {id:'beauty',name:'Beauty & Pflege',icon:'💄'},
+  {id:'baby',name:'Baby & Kind',icon:'🍼'},
+  {id:'furniture',name:'Möbel & Wohnen',icon:'🛋️'},
+  {id:'travel',name:'Reisen & Gutscheine',icon:'✈️'},
+  {id:'other',name:'Sonstige Produkte',icon:'🎁'}
+ ];
+ const retailerOptions=['Amazon','MediaMarkt','Saturn','Mindfactory','eBay','Otto','Alternate','Cyberport','NBB','Coolblue','Steam','Epic Games','AliExpress','Lidl','Aldi','Zalando','Galaxus','Conrad','Notebooksbilliger','Expert','Kaufland'];
+ const shippingOptions=['Kostenlos','Kostenlos mit Prime','1,99 €','2,99 €','3,90 €','3,99 €','4,99 €','5,99 €','6,99 €','7,99 €','Express Versand','Abholung'];
+ const platformOptions=['PC','PS5','Xbox Series X/S','PS4','Xbox One','Nintendo Switch','Mobile (iOS/Android)','VR'];
+ const gameTypes=['Spiel','DLC','Zubehör','Konsole','Controller'];
+ const genres=['Action','RPG','Shooter','Sport','Strategie','Simulator','Adventure','Rennspiel','Horror','Puzzle','MMO'];
+ const brands=['Apple','Samsung','Xiaomi','Google','Sony','Asus','Lenovo','LG','Philips','Bosch','Dyson','Nintendo','Microsoft','Dell','HP','Acer','JBL','Bose','Anker','Logitech'];
+ const storageOptions=['32 GB','64 GB','128 GB','256 GB','512 GB','1 TB','2 TB','4 TB'];
+ const hwCategories=['CPU','GPU','RAM','SSD','Mainboard','Monitor','Netzteil','Gehäuse','Notebook','Kühler','Lüfter','Tastatur','Maus','Headset','Zubehör'];
+ const featureOptions=['Historischer Tiefpreis','Bestpreis','Nur für Prime-Mitglieder','Gutschein auf der Artikelseite aktivieren','Cashback möglich','Versandkostenfrei','Vorbestellung','Limitierte Stückzahl','Nur online verfügbar','Auch im Store erhältlich','App-exklusiv'];
+createApp({setup(){
+ const postMode=ref('collection'), lang=ref('both'), compact=ref(false), toast=ref(''), time=ref('');
+ const modes=[
+  {id:'single',icon:'🔥',name:'Einzeldeal',desc:'Ein Produkt, maximal schnell'},
+  {id:'collection',icon:'🧾',name:'Alle Angebote',desc:'Mehrere Deals in einem Post'},
+  {id:'top',icon:'🏆',name:'Top-Angebote',desc:'Automatisch nach Rabatt sortiert'},
+  {id:'compare',icon:'⚖️',name:'Vergleich',desc:'Produkte direkt gegenüberstellen'},
+  {id:'announcement',icon:'📢',name:'Ankündigung',desc:'Kanal-News & Hinweise'}
+ ];
+ const makeProduct=()=>({id:crypto.randomUUID(),title:'',category:'',categoryCustom:'',price:null,oldPrice:null,platform:'',platformCustom:'',retailer:'',retailerCustom:'',link:'',extra:'',quickTags:['Neu','Kostenloser Versand','Prime','Deluxe Edition']});
+ const products=reactive([makeProduct(),makeProduct()]);
+ const single=reactive({title:'',category:'Gaming Deal',categoryCustom:'',price:null,oldPrice:null,ratingStars:'',ratingCount:'',platform:'',platformCustom:'',retailer:'',retailerCustom:'',shipping:'Kostenlos',shippingCustom:'',validity:'',validityCustom:'',link:'',additionalInfo:'',features:[],productType:'',productTypeCustom:'',genre:'',genreCustom:'',brand:'',brandCustom:'',storage:'',storageCustom:'',hwCat:'',hwCatCustom:''});
+ const announcement=reactive({titleDE:'📢 Wichtige Ankündigung',titleEN:'📢 Important Announcement',textDE:'',textEN:''});
+ const visibleProducts=computed(()=>postMode.value==='compare'?products.slice(0,2):products);
+ const pct=p=>{if(!p.oldPrice||!p.price||p.oldPrice<=p.price)return 0;return Math.round((p.oldPrice-p.price)/p.oldPrice*100)};
+ const resolvedValue=(source,key)=>source[key]==='__custom__'?(source[key+'Custom']||'Eigener Wert'):source[key];
+ const resolvedCategory=source=>source.category==='__custom__'?(source.categoryCustom||'Eigene Kategorie'):source.category;
+ const singleLines=(english=false)=>{
+  const t=single.title||'Produkt'; const lines=[]; lines.push('🛒 '+(english?'Product':'Produkt')+':\n'+t);
+  if(resolvedValue(single,'retailer'))lines.push('🏪 '+(english?'Retailer':'Händler')+':\n'+resolvedValue(single,'retailer'));
+  if(resolvedCategory(single))lines.push('🏷️ '+(english?'Category':'Kategorie')+':\n'+resolvedCategory(single));
+  if(resolvedValue(single,'platform'))lines.push('🎮 '+(english?'Platform':'Plattform')+':\n'+resolvedValue(single,'platform'));
+  if(resolvedValue(single,'brand'))lines.push('🏭 '+(english?'Brand':'Hersteller')+':\n'+resolvedValue(single,'brand'));
+  if(resolvedValue(single,'storage'))lines.push('💾 '+(english?'Storage':'Speicher')+':\n'+resolvedValue(single,'storage'));
+  if(resolvedValue(single,'hwCat'))lines.push('⚙️ '+(english?'Component':'Komponente')+':\n'+resolvedValue(single,'hwCat'));
+  if(resolvedValue(single,'productType'))lines.push('🕹️ '+(english?'Type':'Produktart')+':\n'+resolvedValue(single,'productType'));
+  if(resolvedValue(single,'genre'))lines.push('🎭 '+(english?'Genre':'Genre')+':\n'+resolvedValue(single,'genre'));
+  lines.push('💰 '+(english?'Price':'Preis')+':\n'+(single.price!=null?Number(single.price).toFixed(2)+' €':'Preis offen'));
+  if(single.oldPrice)lines.push('❌ '+(english?'Was':'Statt')+':\n'+Number(single.oldPrice).toFixed(2)+' €');
+  if(singlePct.value)lines.push('📉 '+(english?'Discount':'Rabatt')+':\n'+singlePct.value+'% '+(english?'OFF':'Rabatt'));
+  if(single.ratingStars)lines.push('⭐ '+(english?'Rating':'Bewertung')+':\n'+single.ratingStars+' ⭐'+(single.ratingCount?' | '+single.ratingCount+' '+(english?'reviews':'Bewertungen'):'') );
+  if(resolvedValue(single,'validity'))lines.push('⏳ '+(english?'Valid until':'Gültig bis')+':\n'+resolvedValue(single,'validity'));
+  if(resolvedValue(single,'shipping'))lines.push('🚚 '+(english?'Shipping':'Versand')+':\n'+resolvedValue(single,'shipping'));
+  if(single.features.length)lines.push('✨ '+(english?'Highlights':'Highlights')+':\n'+single.features.map(f=>'• '+f).join('\n'));
+  if(single.link)lines.push('🔗 '+(english?'Deal link':'Zum Angebot')+':\n'+single.link);
+  if(single.additionalInfo)lines.push('📌 '+(english?'Info':'Info')+':\n'+single.additionalInfo);
+  return lines.join('\n\n');
+ };
+ const productLines=(p,i,english=false)=>{
+  const name=p.title||'Unnamed product'; const price=p.price!=null?Number(p.price).toFixed(2).replace('.',english?'.':',')+' €':'Preis offen'; const old=p.oldPrice?Number(p.oldPrice).toFixed(2).replace('.',english?'.':',')+' €':''; const discount=pct(p);
+  const lines=[]; lines.push(`${i?i+'️⃣ ':''}${name}`); if(resolvedCategory(p))lines.push(`${english?'Category':'Kategorie'}: ${resolvedCategory(p)}`); if(resolvedValue(p,'platform'))lines.push(`${english?'Platform':'Plattform'}: ${resolvedValue(p,'platform')}`); if(resolvedValue(p,'retailer'))lines.push(`${english?'Retailer':'Händler'}: ${resolvedValue(p,'retailer')}`); lines.push(`💰 ${english?'Price':'Preis'}: ${price}`); if(old)lines.push(`❌ ${english?'Was':'Statt'}: ${old}`); if(discount)lines.push(`📉 ${english?'Save':'Rabatt'}: ${discount}%`); if(p.extra)lines.push(`✨ ${english?'Details':'Details'}: ${p.extra}`); if(p.link)lines.push(`🔗 ${english?'Deal':'Angebot'}: ${p.link}`); return lines.join('\n');
+ };
+ const toggleSingleFeature=feat=>{const i=single.features.indexOf(feat);if(i>-1)single.features.splice(i,1);else single.features.push(feat)};
+ const singlePct=computed(()=>single.oldPrice&&single.price&&single.oldPrice>single.price?Math.round((single.oldPrice-single.price)/single.oldPrice*100):0);
+ const generatedPost=computed(()=>{ if(postMode.value==='announcement'){const de=`${announcement.titleDE}\n\n🇩🇪 Deutsch\n\n${announcement.textDE}`;const en=`${announcement.titleEN}\n\n🇬🇧 English\n\n${announcement.textEN}`;return lang.value==='de'?de:lang.value==='en'?en:de+'\n\n━━━━━━━━━━━━━━\n\n'+en;}
+  let list=[...products].filter(p=>p.title||p.price!=null||p.link); if(postMode.value==='top') list.sort((a,b)=>pct(b)-pct(a));
+  if(postMode.value==='single') list=[single];
+  if(!list.length)return 'Noch keine Daten. Füge ein Angebot hinzu.';
+  let de='',en='';
+  if(postMode.value==='single'){de=`🔥 DEAL ALERT | ANGEBOT\n\n🇩🇪 Deutsch\n\n${singleLines(false)}`;en=`🔥 DEAL ALERT | OFFER\n\n🇬🇧 English\n\n${singleLines(true)}`}
+  else if(postMode.value==='compare'){const a=list[0],b=list[1]||makeProduct();de=`⚖️ PRODUKTVERGLEICH\n\n🇩🇪 Deutsch\n\n1️⃣ ${a.title||'Produkt A'}\n${productLines(a,0,false).split('\n').slice(1).join('\n')}\n\nVS\n\n2️⃣ ${b.title||'Produkt B'}\n${productLines(b,0,false).split('\n').slice(1).join('\n')}`;en=`⚖️ PRODUCT COMPARISON\n\n🇬🇧 English\n\n1️⃣ ${a.title||'Product A'}\n${productLines(a,0,true).split('\n').slice(1).join('\n')}\n\nVS\n\n2️⃣ ${b.title||'Product B'}\n${productLines(b,0,true).split('\n').slice(1).join('\n')}`}
+  else {const title=postMode.value==='top'?'🏆 TOP-ANGEBOTE | BESTE DEALS':'🧾 ALLE ANGEBOTE | DEAL ÜBERSICHT';const titleEN=postMode.value==='top'?'🏆 TOP DEALS | BEST OFFERS':'🧾 ALL OFFERS | DEAL OVERVIEW';de=title+'\n\n🇩🇪 Deutsch\n\n'+list.map((p,i)=>productLines(p,i+1,false)).join('\n\n──────────\n\n');en=titleEN+'\n\n🇬🇧 English\n\n'+list.map((p,i)=>productLines(p,i+1,true)).join('\n\n──────────\n\n');}
+  const tags='\n\n#CyberDealz #Deal #Offer'; return lang.value==='de'?de+tags:lang.value==='en'?en+tags:de+'\n\n━━━━━━━━━━━━━━\n\n'+en+tags;
+ });
+ const charCount=computed(()=>generatedPost.value.length);
+ const score=computed(()=>{if(postMode.value==='announcement')return announcement.textDE&&announcement.textEN?100:60;const list=postMode.value==='single'?[single]:[...products].filter(p=>p.title||p.price!=null||p.link); if(!list.length)return 0;let s=0;list.forEach(p=>{if(p.title)s+=20;if(p.price!=null)s+=20;if(p.link)s+=15;if(p.platform)s+=10;if(p.retailer)s+=10;if(p.oldPrice)s+=15;});return Math.min(100,Math.round(s/list.length))});
+ const health=computed(()=>{if(postMode.value==='announcement')return[{text:'Deutscher Text vorhanden',ok:!!announcement.textDE},{text:'English text vorhanden',ok:!!announcement.textEN},{text:'Überschrift vorhanden',ok:!!announcement.titleDE&&!!announcement.titleEN}];const list=postMode.value==='single'?[single]:[...products].filter(p=>p.title||p.price!=null||p.link);return[{text:'Produktname',ok:list.every(p=>!!p.title)},{text:'Preis',ok:list.every(p=>p.price!=null)},{text:'Deal-Link',ok:list.every(p=>!!p.link)},{text:'Plattform / Zusatzdetails',ok:list.some(p=>p.platform||p.extra)}]});
+ const addProduct=()=>products.push(makeProduct()); const remove=i=>products.splice(i,1); const duplicate=i=>products.splice(i+1,0,{...products[i],id:crypto.randomUUID()}); const duplicateLast=()=>duplicate(products.length-1); const move=(i,d)=>{const j=i+d;if(j<0||j>=products.length)return;[products[i],products[j]]=[products[j],products[i]]}; const sortProducts=key=>products.sort((a,b)=>key==='discount'?pct(b)-pct(a):(Number(a.price)||999999)-(Number(b.price)||999999));
+ const optimize=()=>{if(postMode.value==='top')sortProducts('discount');if(postMode.value!=='announcement'&&postMode.value!=='single')products.forEach((p,i)=>{if(!p.category&&p.platform)p.category=p.platform+' Deal';});show('Post optimiert')};
+ const toggleLanguage=x=>lang.value=x; const copyPost=async()=>{try{await navigator.clipboard.writeText(generatedPost.value);show('Post kopiert');}catch(e){show('Kopieren nicht möglich')}};
+ const telegramPayload=()=>{let text=generatedPost.value;let url='https://t.me/';const list=postMode.value==='single'?[single]:[...products].filter(p=>p.title||p.price!=null||p.link);if(list[0]?.link){url=list[0].link;const first=list[0].link.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');text=text.replace(new RegExp('🔗 (Angebot|Deal):\\n'+first+'\\n?'),'');}return 'https://t.me/share/url?url='+encodeURIComponent(url)+'&text='+encodeURIComponent(text)};
+ const openTelegram=()=>{if(postMode.value==='announcement'&&!generatedPost.value)return;window.open(telegramPayload(),'_blank','noopener,noreferrer');show('Telegram wird geöffnet…')};
+ const show=m=>{toast.value=m;setTimeout(()=>toast.value='',2200)};
+ const resetAll=()=>{products.splice(0);products.push(makeProduct(),makeProduct());Object.assign(single,{title:'',category:'Gaming Deal',categoryCustom:'',price:null,oldPrice:null,ratingStars:'',ratingCount:'',platform:'',platformCustom:'',retailer:'',retailerCustom:'',shipping:'Kostenlos',shippingCustom:'',validity:'',validityCustom:'',link:'',additionalInfo:'',features:[],productType:'',productTypeCustom:'',genre:'',genreCustom:'',brand:'',brandCustom:'',storage:'',storageCustom:'',hwCat:'',hwCatCustom:''});Object.assign(announcement,{titleDE:'📢 Wichtige Ankündigung',titleEN:'📢 Important Announcement',textDE:'',textEN:''});postMode.value='collection';lang.value='both';show('Zurückgesetzt')};
+ onMounted(()=>{const tick=()=>time.value=new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});tick();setInterval(tick,60000)});
+ return{modes,postMode,lang,compact,products,single,announcement,visibleProducts,generatedPost,charCount,score,health,time,addProduct,remove,duplicate,duplicateLast,move,sortProducts,optimize,toggleLanguage,copyPost,openTelegram,resetAll,toast,categories,retailerOptions,shippingOptions,platformOptions,gameTypes,genres,brands,storageOptions,hwCategories,featureOptions,toggleSingleFeature};
+}}).mount('#app');
 </script>
+<style>.field{width:100%;border:1px solid #e4e4e7;border-radius:12px;padding:.72rem .85rem;font-size:.75rem;outline:none;background:#fff}.field:focus{border-color:#18181b;box-shadow:0 0 0 2px rgba(24,24,27,.04)}.label{display:block;font-size:10px;font-weight:600;color:#71717a;margin-bottom:6px;letter-spacing:.02em}</style>
 </body>
 </html>
